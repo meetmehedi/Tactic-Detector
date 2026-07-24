@@ -13,8 +13,16 @@ build/
 .eggs/
 
 # Model checkpoints (too large for git — use Git LFS or HuggingFace Hub)
+best_model/
 backend/training/checkpoints/
 backend/training/runs/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.zip
+*.png
 
 # Database
 *.db
