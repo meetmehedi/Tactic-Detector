@@ -119,7 +119,7 @@ export default function App() {
       {/* Main Container */}
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Header Hero Section */}
-        <header className="mb-10 text-center max-w-3xl mx-auto">
+        <header className="mb-10 text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4 bg-purple-950/60 text-purple-300 border border-purple-800/50 shadow-sm">
             <span>🧠</span> DistilBERT + SHAP Explainability Engine
           </div>
@@ -175,7 +175,7 @@ export default function App() {
         {/* Main Content: Input vs Results */}
         {!result ? (
           /* Input View */
-          <div className="max-w-3xl mx-auto animate-fade-in">
+          <div className="max-w-5xl mx-auto animate-fade-in">
             <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
 
             <footer className="mt-8 text-center text-xs text-slate-500 font-mono">
