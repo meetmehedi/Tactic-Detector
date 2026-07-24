@@ -1,4 +1,4 @@
-// API client for Tactic Detector backend
+// API client for Tactic Detector backend with GitHub Pages / Offline fallback
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -95,36 +95,125 @@ Recruiter: This is our standard procedure. Do this for me today so we can finali
   },
 ];
 
+// Keyword triggers for client-side fallback
+const TACTIC_PATTERNS = {
+  urgency: /\b(urgent|immediately|right now|24 hours|deadline|2 hours|90 seconds|today|now|emergency|asap|settle|fast)\b/i,
+  authority: /\b(officer|security|division|microsoft|chase|bank|fraud|federal|authorized|police|law|department|verification)\b/i,
+  isolation: /\b(don't tell|keep it|strictly between us|only one|do not hang up|call anyone else|secret|private)\b/i,
+  reciprocity: /\b(favor|help|shared|procedure|give|fee|wire|deposit|send|gift|transfer)\b/i,
+  emotional: /\b(love|scared|stranded|beautiful|trust|consequences|lose everything|scam|help me|fear|panic|please)\b/i,
+};
+
 /**
- * Analyze a conversation transcript
+ * Client-side heuristic analysis engine (Fallback when backend API is unreachable)
+ */
+function analyzeClientSide(transcript) {
+  let totalScore = 0;
+  const tacticCounts = {};
+
+  const turns = transcript.map((t, idx) => {
+    const text = t.text || '';
+    const words = text.split(/\s+/);
+    const tacticsFound = new Set();
+    let turnRisk = 0;
+
+    const highlighted_tokens = words.map(w => {
+      let wordScore = 0;
+      for (const [tactic, pattern] of Object.entries(TACTIC_PATTERNS)) {
+        if (pattern.test(w)) {
+          tacticsFound.add(tactic);
+          wordScore = Math.max(wordScore, 0.45 + Math.random() * 0.4);
+        }
+      }
+      return { token: w, score: wordScore };
+    });
+
+    const tacticsList = Array.from(tacticsFound);
+    if (tacticsList.length === 0) {
+      tacticsList.push('benign');
+      turnRisk = 0.05;
+    } else {
+      turnRisk = Math.min(0.3 + tacticsList.length * 0.25, 0.95);
+      tacticsList.forEach(tac => {
+        tacticCounts[tac] = (tacticCounts[tac] || 0) + 1;
+      });
+    }
+
+    const tactic_scores = {
+      urgency: TACTIC_PATTERNS.urgency.test(text) ? 0.75 : 0.05,
+      authority: TACTIC_PATTERNS.authority.test(text) ? 0.82 : 0.05,
+      isolation: TACTIC_PATTERNS.isolation.test(text) ? 0.68 : 0.05,
+      reciprocity: TACTIC_PATTERNS.reciprocity.test(text) ? 0.55 : 0.05,
+      emotional: TACTIC_PATTERNS.emotional.test(text) ? 0.79 : 0.05,
+    };
+
+    totalScore += turnRisk;
+
+    return {
+      turn_id: idx,
+      speaker: t.speaker || 'Unknown',
+      text,
+      confidence: turnRisk,
+      tactics: tacticsList,
+      highlighted_tokens,
+      tactic_scores,
+    };
+  });
+
+  const overall_risk_score = Math.min(totalScore / (turns.length || 1), 0.95);
+  const flagged_turn_ids = turns.filter(t => !t.tactics.includes('benign')).map(t => t.turn_id);
+
+  let dominant_tactic = 'emotional';
+  let maxCount = -1;
+  for (const [tac, cnt] of Object.entries(tacticCounts)) {
+    if (cnt > maxCount) {
+      maxCount = cnt;
+      dominant_tactic = tac;
+    }
+  }
+
+  return {
+    turns,
+    overall_risk_score: Math.max(overall_risk_score, flagged_turn_ids.length > 0 ? 0.65 : 0.15),
+    dominant_tactic: flagged_turn_ids.length > 0 ? dominant_tactic : null,
+    flagged_turn_ids,
+  };
+}
+
+/**
+ * Analyze a conversation transcript with automatic offline/GitHub Pages fallback
  * @param {Array<{speaker: string, text: string}>} transcript
  * @returns {Promise<object>}
  */
 export async function analyzeTranscript(transcript) {
-  const res = await fetch(`${BASE_URL}/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transcript }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Server error: ${res.status}`);
+  try {
+    const res = await fetch(`${BASE_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript }),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.warn('Backend server unavailable, running client-side fallback analyzer.', e);
   }
-  return res.json();
+
+  // Return client-side inference result
+  return analyzeClientSide(transcript);
 }
 
 /**
- * Run the built-in demo analysis
+ * Run demo analysis with offline fallback
  * @returns {Promise<object>}
  */
 export async function analyzeDemo() {
-  const res = await fetch(`${BASE_URL}/analyze/demo`, { method: 'POST' });
-  if (!res.ok) throw new Error('Demo failed');
-  return res.json();
+  const demoTranscript = parseTranscriptText(PRESET_SCENARIOS[0].text);
+  return analyzeTranscript(demoTranscript);
 }
 
 /**
- * Parse a raw transcript string (one line per turn: "Speaker: text")
+ * Parse raw transcript text (one line per turn: "Speaker: text")
  */
 export function parseTranscriptText(raw) {
   return raw

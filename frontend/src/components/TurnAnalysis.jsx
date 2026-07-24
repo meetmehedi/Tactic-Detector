@@ -1,34 +1,54 @@
 import { useState } from 'react';
 import { TACTIC_META } from '../api';
 
+/* ─── Inline style card shell ─── */
+const card = {
+  backgroundColor: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: 18,
+  padding: '18px 20px',
+  boxSizing: 'border-box',
+  width: '100%',
+  marginBottom: 0,
+};
+
+/* ─── Token Highlight ─── */
 function TokenHighlight({ token, score }) {
-  const [showTooltip, setShowTooltip] = useState(false);
-  if (score < 0.2) return <span className="break-words [overflow-wrap:anywhere]">{token} </span>;
+  const [tip, setTip] = useState(false);
+  if (score < 0.2) return <span>{token} </span>;
 
   const alpha = Math.min(score * 0.7, 0.85);
-  const bg =
-    score > 0.65
-      ? `rgba(239, 68, 68, ${alpha})`
-      : score > 0.4
-      ? `rgba(245, 158, 11, ${alpha})`
-      : `rgba(139, 92, 246, ${alpha * 0.7})`;
-
-  const textColor = score > 0.5 ? '#ffffff' : '#f3f4f6';
+  const bg = score > 0.65
+    ? `rgba(239,68,68,${alpha})`
+    : score > 0.4
+      ? `rgba(245,158,11,${alpha})`
+      : `rgba(139,92,246,${alpha * 0.7})`;
 
   return (
-    <span className="relative inline-block break-words [overflow-wrap:anywhere]">
+    <span style={{ position: 'relative', display: 'inline' }}>
       <span
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onClick={() => setShowTooltip(!showTooltip)}
-        className="token-highlight font-medium px-1 rounded transition-all duration-150 cursor-pointer break-words [overflow-wrap:anywhere]"
-        style={{ background: bg, color: textColor }}
+        onMouseEnter={() => setTip(true)}
+        onMouseLeave={() => setTip(false)}
+        onClick={() => setTip(!tip)}
+        style={{
+          background: bg, color: score > 0.5 ? '#fff' : '#f3f4f6',
+          borderRadius: 4, padding: '1px 5px', cursor: 'pointer',
+          transition: 'filter 0.15s', display: 'inline',
+        }}
       >
         {token}
       </span>
-      {showTooltip && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-30 px-2.5 py-1 text-[11px] font-mono rounded-lg bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] shadow-2xl whitespace-nowrap pointer-events-none animate-fade-in">
-          SHAP score: {(score * 100).toFixed(0)}%
+      {tip && (
+        <span style={{
+          position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+          marginBottom: 6, zIndex: 30, padding: '3px 10px',
+          fontSize: 11, fontFamily: 'var(--mono)',
+          background: 'var(--surface-3)', color: 'var(--text-1)',
+          border: '1px solid var(--border)', borderRadius: 8,
+          whiteSpace: 'nowrap', pointerEvents: 'none',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+        }}>
+          SHAP: {(score * 100).toFixed(0)}%
         </span>
       )}
       {' '}
@@ -36,72 +56,65 @@ function TokenHighlight({ token, score }) {
   );
 }
 
+/* ─── Tactic Badge ─── */
 function TacticBadge({ tactic }) {
   const meta = TACTIC_META[tactic] || TACTIC_META.benign;
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide transition-all shadow-sm"
+      title={meta.desc}
       style={{
-        background: meta.bg,
-        color: meta.color,
+        display: 'inline-flex', alignItems: 'center', gap: 5,
+        padding: '3px 10px', borderRadius: 100,
+        fontSize: 11, fontWeight: 600,
+        background: meta.bg, color: meta.color,
         border: `1px solid ${meta.color}40`,
       }}
-      title={meta.desc}
     >
-      <span>{meta.icon}</span>
-      <span>{meta.label}</span>
+      {meta.icon} {meta.label}
     </span>
   );
 }
 
 export default function TurnAnalysis({ turns, flaggedIds }) {
   const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [search, setSearch] = useState('');
   const [expandedTurn, setExpandedTurn] = useState(null);
   const [showLegend, setShowLegend] = useState(false);
 
   const flaggedSet = new Set(flaggedIds || []);
 
-  const filteredTurns = turns.filter((turn) => {
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const textMatch = turn.text.toLowerCase().includes(q);
-      const speakerMatch = turn.speaker.toLowerCase().includes(q);
-      if (!textMatch && !speakerMatch) return false;
+  const filtered = turns.filter((turn) => {
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      if (!turn.text.toLowerCase().includes(q) && !turn.speaker.toLowerCase().includes(q)) return false;
     }
     if (activeFilter === 'all') return true;
     if (activeFilter === 'flagged') return flaggedSet.has(turn.turn_id);
     return turn.tactics?.includes(activeFilter);
   });
 
+  /* Filter pill style */
+  const pill = (active, color) => ({
+    padding: '5px 13px', borderRadius: 100, fontSize: 12, fontWeight: 600,
+    cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
+    background: active ? (color || 'var(--accent)') : 'var(--surface-2)',
+    color: active ? '#fff' : 'var(--text-2)',
+    transition: 'background 0.18s, color 0.18s',
+  });
+
   return (
-    <div className="flex flex-col gap-5 w-full max-w-full overflow-hidden">
-      {/* Filter & Search Bar */}
-      <div className="glass p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 cursor-pointer ${
-              activeFilter === 'all'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]'
-            }`}
-          >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
+
+      {/* ── Filter Bar ── */}
+      <div style={{ ...card, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        {/* Left: Pills */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+          <button style={pill(activeFilter === 'all')} onClick={() => setActiveFilter('all')}>
             All Turns ({turns.length})
           </button>
-
-          <button
-            onClick={() => setActiveFilter('flagged')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 cursor-pointer ${
-              activeFilter === 'flagged'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]'
-            }`}
-          >
+          <button style={pill(activeFilter === 'flagged', '#ef4444')} onClick={() => setActiveFilter('flagged')}>
             🚨 Flagged ({flaggedSet.size})
           </button>
-
           {Object.entries(TACTIC_META).map(([key, meta]) => {
             if (key === 'benign') return null;
             const count = turns.filter((t) => t.tactics?.includes(key)).length;
@@ -110,176 +123,179 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
               <button
                 key={key}
                 onClick={() => setActiveFilter(key)}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all border-0 cursor-pointer"
                 style={{
-                  background: activeFilter === key ? meta.bg : 'var(--surface-2)',
-                  color: activeFilter === key ? meta.color : 'var(--text-2)',
-                  border: activeFilter === key ? `1px solid ${meta.color}60` : '1px solid var(--border)',
+                  ...pill(activeFilter === key, meta.color),
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
                 }}
               >
-                <span>{meta.icon}</span>
-                <span>{meta.label}</span>
-                <span className="opacity-60 text-[10px]">({count})</span>
+                {meta.icon} {meta.label} <span style={{ opacity: 0.65, fontSize: 10 }}>({count})</span>
               </button>
             );
           })}
         </div>
 
-        {/* Right Tools: Legend Toggle & Search */}
-        <div className="flex items-center gap-2">
+        {/* Right: Legend + Search */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => setShowLegend(!showLegend)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center gap-1 whitespace-nowrap cursor-pointer"
+            style={{
+              padding: '5px 12px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+              background: 'var(--surface-2)', color: 'var(--text-2)',
+              border: '1px solid var(--border)', cursor: 'pointer', whiteSpace: 'nowrap',
+            }}
           >
-            <span>💡</span> Highlight Info
+            💡 Highlight Info
           </button>
-
-          <div className="relative flex-1 sm:w-48">
+          <div style={{ position: 'relative' }}>
             <input
               type="text"
-              placeholder="Search text..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--surface-2)] border border-[var(--border)] focus:border-indigo-500/50 rounded-full px-3.5 py-1.5 text-xs text-[var(--text-1)] outline-none transition-all placeholder:text-[var(--text-3)]"
+              placeholder="Search…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                padding: '5px 30px 5px 12px', borderRadius: 100, fontSize: 12,
+                background: 'var(--surface-2)', color: 'var(--text-1)',
+                border: '1px solid var(--border)', outline: 'none', width: 160,
+              }}
             />
-            {searchQuery && (
+            {search && (
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] hover:text-[var(--text-1)] text-xs border-0 bg-transparent cursor-pointer"
-              >
-                ✕
-              </button>
+                onClick={() => setSearch('')}
+                style={{
+                  position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: 13,
+                }}
+              >✕</button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Explanatory Legend Drawer */}
+      {/* ── Legend Drawer ── */}
       {showLegend && (
-        <div className="glass p-4 rounded-2xl text-xs text-[var(--text-2)] leading-relaxed animate-fade-in flex flex-col gap-2 border border-indigo-500/30 bg-indigo-950/20">
-          <p className="font-semibold text-indigo-300 flex items-center gap-1.5">
-            <span>ℹ️</span> Token Attribution Highlight Scores (SHAP Explainability)
-          </p>
-          <p>
-            Words in the transcript are highlighted based on their influence on the model's tactic predictions:
-          </p>
-          <div className="flex flex-wrap gap-3 pt-1 font-mono text-[11px]">
-            <span className="px-2 py-0.5 rounded bg-red-500/50 text-white font-bold">High Risk (&gt;65%)</span>
-            <span className="px-2 py-0.5 rounded bg-amber-500/50 text-white font-bold">Medium Risk (40-65%)</span>
-            <span className="px-2 py-0.5 rounded bg-purple-500/40 text-purple-200">Low Risk (20-40%)</span>
+        <div style={{
+          ...card,
+          background: 'rgba(99,102,241,0.06)',
+          border: '1px solid rgba(99,102,241,0.25)',
+          fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6,
+        }}>
+          <p style={{ fontWeight: 700, color: 'var(--accent-light)', marginBottom: 8 }}>ℹ️ Token Attribution (SHAP)</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontFamily: 'var(--mono)', fontSize: 11 }}>
+            <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(239,68,68,0.5)', color: '#fff', fontWeight: 700 }}>High Risk (&gt;65%)</span>
+            <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(245,158,11,0.5)', color: '#fff', fontWeight: 700 }}>Medium Risk (40-65%)</span>
+            <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(139,92,246,0.4)', color: '#e9d5ff' }}>Low Risk (20-40%)</span>
           </div>
         </div>
       )}
 
-      {/* Turns List */}
-      {filteredTurns.length === 0 ? (
-        <div className="glass p-8 text-center text-[var(--text-2)] text-sm rounded-2xl">
-          No turns match the current filter or search query.
+      {/* ── Turn List ── */}
+      {filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: 'center', color: 'var(--text-2)', fontSize: 14, padding: 40 }}>
+          No turns match the filter.
         </div>
       ) : (
-        <div className="flex flex-col gap-4 w-full max-w-full overflow-hidden">
-          {filteredTurns.map((turn, idx) => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {filtered.map((turn, idx) => {
             const isFlagged = flaggedSet.has(turn.turn_id);
-            const isScammer =
-              turn.speaker.toLowerCase().includes('scam') ||
-              turn.speaker.toLowerCase().includes('caller') ||
-              turn.speaker === 'A';
+            const isScammer = turn.speaker.toLowerCase().includes('scam') || turn.speaker.toLowerCase().includes('caller') || turn.speaker === 'A';
             const isExpanded = expandedTurn === turn.turn_id;
+            const speakerColor = isScammer ? '#ef4444' : '#3b82f6';
 
             return (
               <div
                 id={`turn-${turn.turn_id}`}
                 key={turn.turn_id}
-                className={`glass glass-interactive p-5 sm:p-6 rounded-2xl transition-all duration-300 w-full max-w-full overflow-hidden ${
-                  isFlagged ? 'border-red-900/40 bg-red-950/10' : ''
-                }`}
-                style={{ animationDelay: `${idx * 40}ms` }}
+                style={{
+                  ...card,
+                  borderColor: isFlagged ? 'rgba(239,68,68,0.3)' : 'var(--border)',
+                  background: isFlagged ? 'rgba(239,68,68,0.04)' : 'var(--surface)',
+                  animationDelay: `${idx * 30}ms`,
+                }}
               >
-                {/* Header */}
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black uppercase shadow-sm"
-                      style={{
-                        background: isScammer
-                          ? 'linear-gradient(135deg, rgba(239,68,68,0.3), rgba(185,28,28,0.2))'
-                          : 'linear-gradient(135deg, rgba(59,130,246,0.3), rgba(29,78,216,0.2))',
-                        color: isScammer ? '#ef4444' : '#3b82f6',
-                        border: `1px solid ${isScammer ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)'}`,
-                      }}
-                    >
+                {/* Header Row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                    {/* Avatar */}
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 900, textTransform: 'uppercase',
+                      background: isScammer ? 'rgba(239,68,68,0.18)' : 'rgba(59,130,246,0.18)',
+                      color: speakerColor, border: `1px solid ${speakerColor}40`,
+                    }}>
                       {turn.speaker[0] || 'U'}
                     </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className="font-bold text-sm truncate"
-                          style={{ color: isScammer ? '#ef4444' : '#3b82f6' }}
-                        >
-                          {turn.speaker}
-                        </span>
-                        <span className="text-[11px] font-mono text-[var(--text-3)]">
-                          Turn #{turn.turn_id + 1}
-                        </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: speakerColor }}>{turn.speaker}</span>
+                        <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-3)' }}>Turn #{turn.turn_id + 1}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                     {isFlagged && (
-                      <span className="px-2.5 py-1 rounded-full font-mono text-xs font-bold bg-red-950/70 text-red-400 border border-red-800/60 shadow-sm">
+                      <span style={{
+                        padding: '3px 10px', borderRadius: 100,
+                        fontSize: 11, fontFamily: 'var(--mono)', fontWeight: 700,
+                        background: 'rgba(239,68,68,0.15)', color: '#f87171',
+                        border: '1px solid rgba(239,68,68,0.3)',
+                      }}>
                         {(turn.confidence * 100).toFixed(0)}% risk
                       </span>
                     )}
-
                     <button
                       onClick={() => setExpandedTurn(isExpanded ? null : turn.turn_id)}
-                      className="text-xs px-3 py-1 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all cursor-pointer"
+                      style={{
+                        padding: '4px 12px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+                        background: 'var(--surface-2)', color: 'var(--text-2)',
+                        border: '1px solid var(--border)', cursor: 'pointer',
+                      }}
                     >
-                      {isExpanded ? 'Hide Scores ▲' : 'Scores ▼'}
+                      {isExpanded ? 'Hide ▲' : 'Scores ▼'}
                     </button>
                   </div>
                 </div>
 
-                {/* Text Content with SHAP Token Highlights & Guaranteed Line Wrapping */}
-                <div className="text-sm leading-relaxed text-[var(--text-1)] font-normal mb-4 break-words [overflow-wrap:anywhere] max-w-full overflow-hidden">
+                {/* Turn Text */}
+                <p style={{
+                  fontSize: 13, lineHeight: 1.65, color: 'var(--text-1)',
+                  marginBottom: 12, wordBreak: 'break-word', overflowWrap: 'anywhere',
+                }}>
                   {turn.highlighted_tokens?.length > 0
                     ? turn.highlighted_tokens.map((ht, i) => (
                         <TokenHighlight key={i} token={ht.token} score={ht.score} />
                       ))
                     : turn.text}
-                </div>
+                </p>
 
                 {/* Tactic Badges */}
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border)]">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
                   {turn.tactics?.map((tactic) => (
                     <TacticBadge key={tactic} tactic={tactic} />
                   ))}
                 </div>
 
-                {/* Expandable Per-tactic Scores Drawer */}
+                {/* Scores Drawer */}
                 {isExpanded && turn.tactic_scores && (
-                  <div className="mt-4 pt-3 border-t border-[var(--border)] grid grid-cols-2 sm:grid-cols-3 gap-2 animate-fade-in">
+                  <div style={{
+                    marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)',
+                    display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8,
+                  }}>
                     {Object.entries(turn.tactic_scores).map(([tactic, score]) => {
                       const meta = TACTIC_META[tactic] || TACTIC_META.benign;
                       const pct = Math.round(score * 100);
                       return (
-                        <div
-                          key={tactic}
-                          className="bg-[var(--surface-2)] p-2.5 rounded-xl border border-[var(--border)] flex flex-col gap-1.5"
-                        >
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span style={{ color: meta.color }} className="font-semibold flex items-center gap-1">
-                              <span>{meta.icon}</span> <span>{meta.label}</span>
-                            </span>
-                            <span className="font-mono text-[var(--text-2)]">{pct}%</span>
+                        <div key={tactic} style={{
+                          background: 'var(--surface-2)', borderRadius: 12, padding: '10px 12px',
+                          border: '1px solid var(--border)',
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 11 }}>
+                            <span style={{ color: meta.color, fontWeight: 600 }}>{meta.icon} {meta.label}</span>
+                            <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-2)' }}>{pct}%</span>
                           </div>
-                          <div className="h-1.5 rounded-full bg-[var(--surface-3)] overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{ width: `${pct}%`, background: meta.color }}
-                            />
+                          <div style={{ height: 4, borderRadius: 2, background: 'var(--surface-3)' }}>
+                            <div style={{ height: '100%', borderRadius: 2, background: meta.color, width: `${pct}%`, transition: 'width 0.5s ease' }} />
                           </div>
                         </div>
                       );

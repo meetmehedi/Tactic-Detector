@@ -1,64 +1,47 @@
 import { useState } from 'react';
 import { TACTIC_META } from '../api';
 
+/* ──────────────────────────────────────────
+   Shared inline-style card
+────────────────────────────────────────── */
+const card = {
+  backgroundColor: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: 18,
+  padding: '20px 22px',
+  boxSizing: 'border-box',
+  width: '100%',
+};
+
 function RiskMeter({ score }) {
   const pct = Math.round(score * 100);
   const circumference = 2 * Math.PI * 45;
   const offset = circumference * (1 - score);
-
   const color = score > 0.7 ? '#ef4444' : score > 0.4 ? '#f59e0b' : '#10b981';
   const label = score > 0.7 ? 'High Scam Risk' : score > 0.4 ? 'Moderate Risk' : 'Low / Benign';
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative flex items-center justify-center">
-        <svg width="120" height="120" viewBox="0 0 110 110" className="transform -rotate-90">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg width="120" height="120" viewBox="0 0 110 110" style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx="55" cy="55" r="45" fill="none" stroke="var(--border)" strokeWidth="9" />
           <circle
-            cx="55"
-            cy="55"
-            r="45"
-            fill="none"
-            stroke="var(--border)"
-            strokeWidth="9"
-          />
-          <circle
-            cx="55"
-            cy="55"
-            r="45"
-            fill="none"
-            stroke={color}
-            strokeWidth="9"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            className="risk-ring transition-all duration-1000"
-            style={{
-              '--offset': offset,
-              filter: `drop-shadow(0 0 8px ${color}88)`,
-            }}
+            cx="55" cy="55" r="45" fill="none"
+            stroke={color} strokeWidth="9" strokeLinecap="round"
+            strokeDasharray={circumference} strokeDashoffset={offset}
+            style={{ filter: `drop-shadow(0 0 8px ${color}99)`, transition: 'stroke-dashoffset 1s ease' }}
           />
         </svg>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-extrabold font-mono tracking-tight" style={{ color }}>
-            {pct}%
-          </span>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-3)] mt-0.5">
-            Risk Index
-          </span>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 28, fontWeight: 900, fontFamily: 'var(--mono)', color, lineHeight: 1 }}>{pct}%</span>
+          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)', marginTop: 3 }}>Risk Index</span>
         </div>
       </div>
-
-      <div
-        className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
-        style={{
-          background: `${color}18`,
-          color: color,
-          border: `1px solid ${color}40`,
-        }}
-      >
-        {label}
-      </div>
+      <span style={{
+        padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700,
+        textTransform: 'uppercase', letterSpacing: '0.06em',
+        background: `${color}18`, color, border: `1px solid ${color}40`,
+      }}>{label}</span>
     </div>
   );
 }
@@ -78,17 +61,16 @@ export default function TacticTimeline({ result }) {
   const sortedTactics = Object.entries(tacticCounts).sort((a, b) => b[1] - a[1]);
 
   function handleScrollToTurn(turnId) {
-    const el = document.getElementById(`turn-${turnId}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById(`turn-${turnId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  function handleCopyJSON() {
+  function handleCopy() {
     navigator.clipboard.writeText(JSON.stringify(result, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handleDownloadJSON() {
+  function handleDownload() {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -98,75 +80,75 @@ export default function TacticTimeline({ result }) {
     URL.revokeObjectURL(url);
   }
 
+  const label = (txt) => (
+    <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)', marginBottom: 14 }}>{txt}</p>
+  );
+
   return (
-    <div className="flex flex-col gap-5 sticky top-24">
-      {/* Overall Risk Score Card */}
-      <div className="card-futuristic p-6 flex flex-col items-center gap-4 text-center shadow-xl">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--text-3)]">
-          Overall Risk Assessment
-        </h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'sticky', top: 84 }}>
+
+      {/* ── Overall Risk ── */}
+      <div style={{ ...card, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, textAlign: 'center' }}>
+        {label('Overall Risk Assessment')}
         <RiskMeter score={overall_risk_score} />
-        <div className="w-full pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-2)]">
+        <div style={{
+          width: '100%', paddingTop: 14, marginTop: 4,
+          borderTop: '1px solid var(--border)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          fontSize: 12, color: 'var(--text-2)',
+        }}>
           <span>Flagged Turns:</span>
-          <span className="font-mono font-bold text-red-500">
+          <span style={{ fontFamily: 'var(--mono)', fontWeight: 700, color: '#ef4444' }}>
             {flagged_turn_ids?.length || 0} / {turns.length}
           </span>
         </div>
       </div>
 
-      {/* Primary Tactic Card */}
-      {dominant_tactic && (
-        <div className="card-futuristic p-5 animate-fade-in shadow-md">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)] mb-2">
-            Dominant Manipulation Strategy
-          </p>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl p-2 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-              {TACTIC_META[dominant_tactic]?.icon}
-            </span>
-            <div>
-              <p
-                className="font-bold text-base"
-                style={{ color: TACTIC_META[dominant_tactic]?.color }}
-              >
-                {TACTIC_META[dominant_tactic]?.label}
-              </p>
-              <p className="text-xs text-[var(--text-2)] mt-0.5 line-clamp-1">
-                {TACTIC_META[dominant_tactic]?.desc}
-              </p>
+      {/* ── Dominant Tactic ── */}
+      {dominant_tactic && (() => {
+        const meta = TACTIC_META[dominant_tactic];
+        return (
+          <div style={card}>
+            {label('Dominant Manipulation Strategy')}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{
+                fontSize: 28, padding: '8px 10px', borderRadius: 12,
+                background: 'var(--surface-2)', border: '1px solid var(--border)',
+              }}>{meta?.icon}</span>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 15, color: meta?.color }}>{meta?.label}</p>
+                <p style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 3, lineClamp: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 220 }}>{meta?.desc}</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
-      {/* Tactic Breakdown Progress Bars */}
+      {/* ── Frequency Breakdown ── */}
       {sortedTactics.length > 0 && (
-        <div className="card-futuristic p-5 shadow-md">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)] mb-3">
-            Strategy Frequency Breakdown
-          </p>
-          <div className="flex flex-col gap-3">
+        <div style={card}>
+          {label('Strategy Frequency Breakdown')}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {sortedTactics.map(([tactic, count]) => {
               const meta = TACTIC_META[tactic] || TACTIC_META.benign;
-              const barWidth = `${(count / turns.length) * 100}%`;
+              const pct = Math.round((count / turns.length) * 100);
               return (
-                <div key={tactic} className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="flex items-center gap-1.5 font-semibold" style={{ color: meta.color }}>
-                      <span>{meta.icon}</span>
-                      <span>{meta.label}</span>
+                <div key={tactic}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5, fontSize: 12 }}>
+                    <span style={{ color: meta.color, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      {meta.icon} {meta.label}
                     </span>
-                    <span className="font-mono text-[var(--text-2)]">{count} turns ({Math.round((count/turns.length)*100)}%)</span>
+                    <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-2)', fontSize: 11 }}>
+                      {count} turns ({pct}%)
+                    </span>
                   </div>
-                  <div className="h-2 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: barWidth,
-                        background: meta.color,
-                        boxShadow: `0 0 8px ${meta.color}88`,
-                      }}
-                    />
+                  <div style={{ height: 6, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 4,
+                      width: `${pct}%`, background: meta.color,
+                      boxShadow: `0 0 8px ${meta.color}88`,
+                      transition: 'width 0.7s ease',
+                    }} />
                   </div>
                 </div>
               );
@@ -175,33 +157,34 @@ export default function TacticTimeline({ result }) {
         </div>
       )}
 
-      {/* Interactive Conversation Map */}
-      <div className="card-futuristic p-5 shadow-md">
-        <div className="flex justify-between items-center mb-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)]">
-            Interactive Turn Map
-          </p>
-          <span className="text-[10px] text-[var(--text-3)] font-mono">Click to jump</span>
+      {/* ── Turn Map ── */}
+      <div style={card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          {label('Interactive Turn Map')}
+          <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)', marginTop: -12 }}>Click to jump</span>
         </div>
-
-        <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, maxHeight: 150, overflowY: 'auto' }}>
           {turns.map((turn, i) => {
             const isFlagged = flagged_turn_ids?.includes(turn.turn_id);
             const mainTactic = turn.tactics?.find((t) => t !== 'benign') || 'benign';
             const meta = TACTIC_META[mainTactic];
-
             return (
               <button
                 key={i}
                 type="button"
                 onClick={() => handleScrollToTurn(turn.turn_id)}
                 title={`Turn #${i + 1} (${turn.speaker}): ${turn.tactics?.join(', ')}`}
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold transition-all hover:scale-125 hover:z-20 cursor-pointer border-0"
                 style={{
+                  width: 22, height: 22, borderRadius: 6,
+                  fontSize: 10, fontFamily: 'var(--mono)', fontWeight: 700,
                   background: isFlagged ? meta.color : 'var(--surface-2)',
-                  color: isFlagged ? '#fff' : 'var(--text-2)',
+                  color: isFlagged ? '#fff' : 'var(--text-3)',
+                  border: 'none', cursor: 'pointer',
                   boxShadow: isFlagged ? `0 0 6px ${meta.color}99` : 'none',
+                  transition: 'transform 0.15s',
                 }}
+                onMouseEnter={(e) => { e.target.style.transform = 'scale(1.25)'; }}
+                onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; }}
               >
                 {i + 1}
               </button>
@@ -210,22 +193,31 @@ export default function TacticTimeline({ result }) {
         </div>
       </div>
 
-      {/* Export Action Buttons */}
-      <div className="flex gap-2">
+      {/* ── Export Buttons ── */}
+      <div style={{ display: 'flex', gap: 8 }}>
         <button
-          onClick={handleCopyJSON}
-          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          onClick={handleCopy}
+          style={{
+            flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 12, fontWeight: 600,
+            background: 'var(--surface-2)', color: 'var(--text-1)',
+            border: '1px solid var(--border)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'background 0.2s',
+          }}
         >
-          <span>{copied ? '✅' : '📋'}</span>
-          <span>{copied ? 'Copied!' : 'Copy Data'}</span>
+          {copied ? '✅ Copied!' : '📋 Copy Data'}
         </button>
-
         <button
-          onClick={handleDownloadJSON}
-          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          onClick={handleDownload}
+          style={{
+            flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 12, fontWeight: 600,
+            background: 'var(--surface-2)', color: 'var(--text-1)',
+            border: '1px solid var(--border)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'background 0.2s',
+          }}
         >
-          <span>📥</span>
-          <span>Export JSON</span>
+          📥 Export JSON
         </button>
       </div>
     </div>
