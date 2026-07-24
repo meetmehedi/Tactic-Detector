@@ -34,7 +34,7 @@ export default function App() {
       const data = await analyzeTranscript(turns);
       setResult(data);
     } catch (err) {
-      setError(err.message || 'Analysis failed. Is the backend server running on port 8000?');
+      setError(err.message || 'Analysis failed. Is the backend running on port 8000?');
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export default function App() {
       const data = await analyzeDemo();
       setResult(data);
     } catch (err) {
-      setError(err.message || 'Demo failed. Is the backend server running?');
+      setError(err.message || 'Demo failed. Is the backend running?');
     } finally {
       setLoading(false);
     }
@@ -60,47 +60,86 @@ export default function App() {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col relative selection:bg-indigo-500/30">
-      {/* Background Radial Glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    <div style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* Background glow — only on input view */}
+      {!result && (
         <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[850px] h-[500px] rounded-full blur-[150px] opacity-20 pointer-events-none"
+          aria-hidden="true"
           style={{
-            background: 'radial-gradient(circle, #6366f1 0%, #4338ca 50%, transparent 80%)',
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 0,
+            overflow: 'hidden',
           }}
-        />
-      </div>
+        >
+          <div style={{
+            position: 'absolute',
+            top: '-160px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '800px',
+            height: '480px',
+            borderRadius: '50%',
+            filter: 'blur(130px)',
+            opacity: 0.18,
+            background: 'radial-gradient(circle, #6366f1 0%, #4338ca 50%, transparent 80%)',
+          }} />
+        </div>
+      )}
 
-      {/* Top Navbar */}
+      {/* ── NAVBAR ── */}
       <header className="nav-fixed">
         <div className="nav-inner">
           {/* Logo */}
           <button
             onClick={handleReset}
-            className="flex items-center gap-2.5 text-left hover:opacity-90 transition-all border-0 bg-transparent cursor-pointer"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: 'none', border: 'none', cursor: 'pointer',
+            }}
           >
-            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs shadow-lg shadow-indigo-500/30">
-              🛡️
-            </div>
-            <span className="font-black text-base tracking-tight text-[var(--text-1)]">
-              Tactic<span className="text-indigo-500 font-semibold">Detector</span>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'var(--accent)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', fontSize: 14,
+              boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
+            }}>🛡️</div>
+            <span style={{ fontWeight: 900, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--text-1)' }}>
+              Tactic<span style={{ color: 'var(--accent)', fontWeight: 600 }}>Detector</span>
             </span>
           </button>
 
-          {/* Right Nav Options */}
-          <div className="flex items-center gap-3">
+          {/* Right */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* Status */}
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-2)]">
-              <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '4px 12px', borderRadius: 100,
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              fontSize: 12, fontWeight: 600, color: 'var(--text-2)',
+            }}>
+              <span style={{
+                width: 8, height: 8, borderRadius: '50%',
+                background: apiOnline ? '#10b981' : '#f59e0b',
+                display: 'inline-block',
+              }} />
               <span className="hidden sm:inline">{apiOnline ? 'Model Online' : 'Local Engine'}</span>
             </div>
 
-            {/* Portfolio Link */}
+            {/* Portfolio */}
             <a
               href="https://mdmehedihasan.us"
               target="_blank"
               rel="noreferrer"
-              className="hidden sm:inline-flex text-xs font-medium px-3.5 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-[var(--surface-2)] transition-all decoration-0"
+              style={{
+                display: 'none',
+                fontSize: 12, fontWeight: 500, padding: '6px 14px',
+                borderRadius: 100, color: 'var(--text-2)',
+                textDecoration: 'none', border: '1px solid var(--border)',
+                background: 'var(--surface-2)',
+              }}
+              className="sm:inline-flex"
             >
               Md. Mehedi Hasan
             </a>
@@ -110,19 +149,28 @@ export default function App() {
               href="https://github.com/meetmehedi/Tactic-Detector"
               target="_blank"
               rel="noreferrer"
-              className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center gap-1.5 decoration-0"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                fontSize: 12, fontWeight: 600, padding: '6px 14px',
+                borderRadius: 100, color: 'var(--text-1)',
+                textDecoration: 'none', border: '1px solid var(--border)',
+                background: 'var(--surface-2)',
+              }}
             >
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+              <svg style={{ width: 14, height: 14, fill: 'currentColor' }} viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
               </svg>
-              <span>GitHub</span>
+              GitHub
             </a>
 
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-xs transition-all cursor-pointer"
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              style={{
+                padding: '6px 10px', borderRadius: 100, fontSize: 14, cursor: 'pointer',
+                background: 'var(--surface-2)', border: '1px solid var(--border)',
+              }}
             >
               {theme === 'dark' ? '🌙' : '☀️'}
             </button>
@@ -130,100 +178,108 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="widescreen-container relative z-10 flex-1">
-        {/* Minimal Hero */}
-        <div className="hero-box animate-up">
-          <h1 className="hero-title title-gradient">
-            Social Engineering Tactic Detector
-          </h1>
+      {/* ── MAIN ── */}
+      <main className="widescreen-container" style={{ flex: 1, position: 'relative', zIndex: 1 }}>
 
-          <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed font-normal">
-            Analyze multi-turn conversations to identify manipulation strategies using DistilBERT & SHAP attribution heatmaps.
-          </p>
-
-          {/* Tactic Pills */}
-          <div className="flex flex-wrap justify-center items-center gap-2 mt-5">
-            {Object.entries(TACTIC_META).map(([key, meta]) => {
-              if (key === 'benign') return null;
-              return (
-                <div
-                  key={key}
-                  className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-                  style={{
-                    background: meta.bg,
-                    color: meta.color,
-                    border: `1px solid ${meta.color}35`,
-                  }}
-                  title={meta.desc}
-                >
-                  <span>{meta.icon}</span>
-                  <span>{meta.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Global Error Banner */}
-        {error && (
-          <div className="mb-8 p-4 rounded-2xl text-xs sm:text-sm font-medium bg-red-950/50 text-red-300 border border-red-800/60 flex items-center justify-between gap-3 animate-fade-in max-w-3xl mx-auto">
-            <div className="flex items-center gap-2">
-              <span>⚠️</span>
-              <span>{error}</span>
+        {/* ── INPUT VIEW ── */}
+        {!result && (
+          <div className="animate-up">
+            {/* Hero */}
+            <div className="hero-box">
+              <h1 className="hero-title title-gradient">Social Engineering<br />Tactic Detector</h1>
+              <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 20 }}>
+                Detect manipulation tactics in conversations using DistilBERT + SHAP attribution.
+              </p>
+              {/* Tactic pills */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+                {Object.entries(TACTIC_META).map(([key, meta]) => {
+                  if (key === 'benign') return null;
+                  return (
+                    <span
+                      key={key}
+                      title={meta.desc}
+                      style={{
+                        padding: '4px 12px', borderRadius: 100, fontSize: 12,
+                        fontWeight: 600, background: meta.bg, color: meta.color,
+                        border: `1px solid ${meta.color}35`,
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                      }}
+                    >
+                      {meta.icon} {meta.label}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-            <button onClick={() => setError('')} className="text-red-400 hover:text-white font-bold bg-transparent border-0 cursor-pointer">
-              ✕
-            </button>
+
+            {/* Error */}
+            {error && (
+              <div style={{
+                maxWidth: 700, margin: '0 auto 24px',
+                padding: '12px 16px', borderRadius: 14,
+                background: 'rgba(239,68,68,0.12)', color: '#fca5a5',
+                border: '1px solid rgba(239,68,68,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                fontSize: 13,
+              }}>
+                <span>⚠️ {error}</span>
+                <button onClick={() => setError('')} style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              </div>
+            )}
+
+            {/* Input Card */}
+            <div className="input-widescreen">
+              <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
+              <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)', marginTop: 24 }}>
+                Md. Mehedi Hasan · DistilBERT ML · SHAP Explainability Engine
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Content Area */}
-        {!result ? (
-          /* Input View */
-          <div className="input-widescreen animate-up">
-            <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
+        {/* ── RESULTS VIEW ── */}
+        {result && (
+          <div className="animate-up" style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
 
-            <footer className="mt-12 text-center text-xs text-[var(--text-3)] font-mono">
-              Md. Mehedi Hasan • DistilBERT ML • SHAP Explainability Engine
-            </footer>
-          </div>
-        ) : (
-          /* Results View */
-          <div className="animate-up flex flex-col gap-6 w-full">
-            {/* Top Toolbar */}
-            <div className="card-futuristic p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 w-full">
-              <RiskBadge
-                score={result.overall_risk_score}
-                dominantTactic={result.dominant_tactic}
-              />
-
+            {/* Results Toolbar */}
+            <div style={{
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: 16, padding: '14px 20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              flexWrap: 'wrap', gap: 12, width: '100%', boxSizing: 'border-box',
+            }}>
+              <RiskBadge score={result.overall_risk_score} dominantTactic={result.dominant_tactic} />
               <button
                 onClick={handleReset}
-                className="px-5 py-2.5 rounded-full text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white border-0 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/30 cursor-pointer"
+                style={{
+                  padding: '8px 20px', borderRadius: 100,
+                  background: 'var(--accent)', color: '#fff',
+                  border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13,
+                  boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
               >
-                <span>✏️</span> New Analysis
+                ✏️ New Analysis
               </button>
             </div>
 
-            {/* Grid Layout */}
+            {/* Grid: Turns + Sidebar */}
             <div className="grid-widescreen">
-              {/* Turn-by-Turn Analysis */}
-              <div className="flex flex-col gap-4 w-full min-w-0">
-                <div className="flex items-center justify-between px-1">
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-2)] flex items-center gap-2">
-                    <span>💬</span> Turn-by-Turn Analysis ({result.turns.length} turns)
-                  </h2>
-                  <span className="text-[11px] text-[var(--text-3)] font-mono">
+              {/* Left: Turn-by-Turn */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)' }}>
+                    💬 Turn-by-Turn Analysis ({result.turns.length} turns)
+                  </span>
+                  <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>
                     {result.flagged_turn_ids?.length || 0} Flagged
                   </span>
                 </div>
-
                 <TurnAnalysis turns={result.turns} flaggedIds={result.flagged_turn_ids} />
               </div>
 
-              {/* Sidebar Overview */}
-              <div className="w-full min-w-0">
+              {/* Right: Sidebar */}
+              <div style={{ minWidth: 0 }}>
                 <TacticTimeline result={result} />
               </div>
             </div>
