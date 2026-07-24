@@ -1,31 +1,32 @@
 import { useState, useRef } from 'react';
-import { parseTranscriptText } from '../api';
+import { parseTranscriptText, PRESET_SCENARIOS } from '../api';
 
-const PLACEHOLDER = `Scammer: Hello, this is your bank calling. Your account has been suspended.
+const PLACEHOLDER_TEXT = `Scammer: Hello, this is Chase Fraud Prevention calling. Your account has been flagged.
 Victim: Oh no, what happened?
-Scammer: We detected suspicious activity. You must act immediately or lose all access.
+Scammer: We detected suspicious activity. You must verify your account details immediately or lose access.
 Victim: How do I fix this?
-Scammer: Don't tell anyone about this call. Just give me your account details right now.`;
+Scammer: Don't tell anyone about this call. Just read your 6-digit passcode to me right now.`;
 
 export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   const [text, setText] = useState('');
   const [mode, setMode] = useState('text'); // 'text' | 'json'
   const [error, setError] = useState('');
+  const [dragActive, setDragActive] = useState(false);
   const fileRef = useRef();
 
   function handleSubmit(e) {
-    e.preventDefault();
+    e?.preventDefault();
     setError('');
-    if (!text.trim()) { setError('Please paste a transcript or upload a file.'); return; }
+    if (!text.trim()) { setError('Please paste a transcript or pick a preset scenario.'); return; }
     try {
       let turns;
       if (mode === 'json') {
         const parsed = JSON.parse(text);
         turns = Array.isArray(parsed) ? parsed : parsed.transcript;
-        if (!turns?.length) throw new Error('JSON must contain a "transcript" array.');
+        if (!turns?.length) throw new Error('JSON must contain a "transcript" array of turns.');
       } else {
         turns = parseTranscriptText(text);
-        if (!turns.length) throw new Error('Could not parse transcript. Use "Speaker: text" format.');
+        if (!turns.length) throw new Error('Could not parse transcript. Use "Speaker: text" per line.');
       }
       onAnalyze(turns);
     } catch (err) {
@@ -33,8 +34,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
     }
   }
 
-  function handleFile(e) {
-    const file = e.target.files?.[0];
+  function handleFile(file) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -44,96 +44,149 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
     reader.readAsText(file);
   }
 
+  function handlePreset(scenario) {
+    setText(scenario.text);
+    setMode('text');
+    setError('');
+  }
+
   return (
-    <div className="glass rounded-2xl p-6 flex flex-col gap-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Paste Transcript</h2>
-        <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          {['text', 'json'].map(m => (
+    <div className="glass rounded-3xl p-6 lg:p-8 flex flex-col gap-6 shadow-2xl transition-all">
+      {/* Top Title & Presets */}
+      <div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <span>✍️</span> Transcript Input
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Paste conversation turns or pick a pre-loaded real scam scenario
+            </p>
+          </div>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/80 border border-slate-800 self-start sm:self-auto">
+            {['text', 'json'].map(m => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
+                  mode === m
+                    ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {m} Format
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Preset Chips */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
+          <span className="text-xs text-slate-400 self-center font-medium mr-1">Presets:</span>
+          {PRESET_SCENARIOS.map((preset) => (
             <button
-              key={m}
-              onClick={() => setMode(m)}
-              className="px-3 py-1 rounded-md text-sm font-medium transition-all duration-200"
-              style={{
-                background: mode === m ? 'rgba(139,92,246,0.3)' : 'transparent',
-                color: mode === m ? '#c4b5fd' : '#6b6b8a',
-                border: mode === m ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
-              }}
+              key={preset.id}
+              type="button"
+              onClick={() => handlePreset(preset)}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/50 hover:bg-purple-900/30 text-slate-300 hover:text-purple-200 border border-slate-700/50 hover:border-purple-500/30 transition-all duration-200"
             >
-              {m.toUpperCase()}
+              {preset.title}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Textarea */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <textarea
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder={mode === 'json' ? '{"transcript": [{"speaker": "A", "text": "..."}]}' : PLACEHOLDER}
-          rows={10}
-          className="w-full rounded-xl p-4 text-sm resize-none outline-none transition-all duration-200 font-mono"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#e8e8f0',
-            lineHeight: '1.6',
+      {/* Main Textarea & Drag Drop */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div
+          className={`relative rounded-2xl transition-all duration-200 ${
+            dragActive ? 'ring-2 ring-purple-500 bg-purple-950/20' : ''
+          }`}
+          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+            if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
           }}
-          onFocus={e => e.target.style.borderColor = 'rgba(139,92,246,0.5)'}
-          onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-        />
+        >
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={
+              mode === 'json'
+                ? '{\n  "transcript": [\n    {"speaker": "Scammer", "text": "Urgent alert..."},\n    {"speaker": "Victim", "text": "What do I do?"}\n  ]\n}'
+                : PLACEHOLDER_TEXT
+            }
+            rows={9}
+            className="w-full rounded-2xl p-5 text-sm resize-none outline-none font-mono bg-slate-950/60 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:border-purple-500/60 focus:ring-1 focus:ring-purple-500/40 transition-all duration-200 leading-relaxed"
+          />
 
+          <div className="absolute bottom-3 right-4 text-[11px] font-mono text-slate-500 pointer-events-none">
+            {text.split('\n').filter(l => l.trim()).length} turns • {text.length} chars
+          </div>
+        </div>
+
+        {/* Error message */}
         {error && (
-          <p className="text-sm px-3 py-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.1)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.2)' }}>
-            ⚠ {error}
-          </p>
+          <div className="px-4 py-3 rounded-xl text-xs font-medium bg-red-950/40 text-red-300 border border-red-800/50 flex items-center gap-2 animate-fade-in">
+            <span>⚠️</span>
+            <span>{error}</span>
+          </div>
         )}
 
-        <div className="flex gap-2">
-          {/* File upload */}
+        {/* Action Controls */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex-none px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02]"
-            style={{ background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.08)' }}
+            className="px-5 py-3 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 hover:border-slate-500 transition-all flex items-center justify-center gap-2 shadow-sm"
           >
-            📎 Upload File
+            <span>📎</span> Attach File
           </button>
-          <input ref={fileRef} type="file" accept=".txt,.json" className="hidden" onChange={handleFile} />
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".txt,.json"
+            className="hidden"
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
 
-          {/* Demo */}
           <button
             type="button"
             onClick={onDemo}
             disabled={loading}
-            className="flex-none px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
-            style={{ background: 'rgba(16,185,129,0.1)', color: '#34d399', border: '1px solid rgba(16,185,129,0.2)' }}
+            className="px-5 py-3 rounded-xl text-xs font-semibold bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-700/40 hover:border-emerald-500/50 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
           >
-            ▶ Run Demo
+            <span>▶</span> Quick Demo
           </button>
 
-          {/* Analyze */}
           <button
             type="submit"
             disabled={loading || !text.trim()}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 px-6 rounded-xl text-sm font-bold text-white transition-all shadow-lg hover:shadow-purple-500/25 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{
-              background: loading ? 'rgba(139,92,246,0.2)' : 'linear-gradient(135deg, #7c3aed, #4f46e5)',
-              color: 'white',
-              boxShadow: loading ? 'none' : '0 4px 20px rgba(124,58,237,0.4)',
+              background: loading
+                ? 'rgba(124, 58, 237, 0.3)'
+                : 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
             }}
           >
             {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Analyzing…
-              </span>
-            ) : '🔍 Analyze Transcript'}
+                Analyzing Transcript…
+              </>
+            ) : (
+              <>
+                <span>⚡</span> Analyze Social Tactics
+              </>
+            )}
           </button>
         </div>
       </form>
