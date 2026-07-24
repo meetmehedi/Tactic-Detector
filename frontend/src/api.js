@@ -98,10 +98,10 @@ Recruiter: This is our standard procedure. Do this for me today so we can finali
 // Keyword triggers for client-side fallback
 const TACTIC_PATTERNS = {
   urgency: /\b(urgent|immediately|right now|24 hours|deadline|2 hours|90 seconds|today|now|emergency|asap|settle|fast)\b/i,
-  authority: /\b(officer|security|division|microsoft|chase|bank|fraud|federal|authorized|police|law|department|verification)\b/i,
+  authority: /\b(officer|security|division|microsoft|chase|bank|fraud|federal|authorized|police|law|department|verification|agent)\b/i,
   isolation: /\b(don't tell|keep it|strictly between us|only one|do not hang up|call anyone else|secret|private)\b/i,
-  reciprocity: /\b(favor|help|shared|procedure|give|fee|wire|deposit|send|gift|transfer)\b/i,
-  emotional: /\b(love|scared|stranded|beautiful|trust|consequences|lose everything|scam|help me|fear|panic|please)\b/i,
+  reciprocity: /\b(favor|help|shared|procedure|give|fee|wire|deposit|send|gift|transfer|pay|code|passcode|pin)\b/i,
+  emotional: /\b(love|scared|stranded|beautiful|trust|consequences|lose everything|scam|help me|fear|panic|please|jail|arrest)\b/i,
 };
 
 /**
@@ -113,38 +113,42 @@ function analyzeClientSide(transcript) {
 
   const turns = transcript.map((t, idx) => {
     const text = t.text || '';
+    // Strip punctuation to check tokens clean
     const words = text.split(/\s+/);
     const tacticsFound = new Set();
-    let turnRisk = 0;
+    let maxTurnWordScore = 0;
 
     const highlighted_tokens = words.map(w => {
+      const cleanWord = w.replace(/[^a-zA-Z0-9]/g, '');
       let wordScore = 0;
       for (const [tactic, pattern] of Object.entries(TACTIC_PATTERNS)) {
-        if (pattern.test(w)) {
+        if (pattern.test(cleanWord)) {
           tacticsFound.add(tactic);
-          wordScore = Math.max(wordScore, 0.45 + Math.random() * 0.4);
+          wordScore = 0.65 + Math.random() * 0.25;
         }
       }
+      maxTurnWordScore = Math.max(maxTurnWordScore, wordScore);
       return { token: w, score: wordScore };
     });
 
     const tacticsList = Array.from(tacticsFound);
-    if (tacticsList.length === 0) {
-      tacticsList.push('benign');
-      turnRisk = 0.05;
-    } else {
-      turnRisk = Math.min(0.3 + tacticsList.length * 0.25, 0.95);
+    let turnRisk = 0.02;
+
+    if (tacticsList.length > 0) {
+      turnRisk = Math.min(0.4 + tacticsList.length * 0.2, 0.95);
       tacticsList.forEach(tac => {
         tacticCounts[tac] = (tacticCounts[tac] || 0) + 1;
       });
+    } else {
+      tacticsList.push('benign');
     }
 
     const tactic_scores = {
-      urgency: TACTIC_PATTERNS.urgency.test(text) ? 0.75 : 0.05,
-      authority: TACTIC_PATTERNS.authority.test(text) ? 0.82 : 0.05,
-      isolation: TACTIC_PATTERNS.isolation.test(text) ? 0.68 : 0.05,
-      reciprocity: TACTIC_PATTERNS.reciprocity.test(text) ? 0.55 : 0.05,
-      emotional: TACTIC_PATTERNS.emotional.test(text) ? 0.79 : 0.05,
+      urgency: TACTIC_PATTERNS.urgency.test(text) ? 0.78 : 0.02,
+      authority: TACTIC_PATTERNS.authority.test(text) ? 0.85 : 0.02,
+      isolation: TACTIC_PATTERNS.isolation.test(text) ? 0.72 : 0.02,
+      reciprocity: TACTIC_PATTERNS.reciprocity.test(text) ? 0.64 : 0.02,
+      emotional: TACTIC_PATTERNS.emotional.test(text) ? 0.81 : 0.02,
     };
 
     totalScore += turnRisk;
@@ -160,11 +164,11 @@ function analyzeClientSide(transcript) {
     };
   });
 
-  const overall_risk_score = Math.min(totalScore / (turns.length || 1), 0.95);
   const flagged_turn_ids = turns.filter(t => !t.tactics.includes('benign')).map(t => t.turn_id);
+  const overall_risk_score = turns.length > 0 ? (totalScore / turns.length) : 0.02;
 
-  let dominant_tactic = 'emotional';
-  let maxCount = -1;
+  let dominant_tactic = null;
+  let maxCount = 0;
   for (const [tac, cnt] of Object.entries(tacticCounts)) {
     if (cnt > maxCount) {
       maxCount = cnt;
@@ -174,7 +178,7 @@ function analyzeClientSide(transcript) {
 
   return {
     turns,
-    overall_risk_score: Math.max(overall_risk_score, flagged_turn_ids.length > 0 ? 0.65 : 0.15),
+    overall_risk_score: flagged_turn_ids.length > 0 ? Math.max(overall_risk_score, 0.45) : Math.min(overall_risk_score, 0.1),
     dominant_tactic: flagged_turn_ids.length > 0 ? dominant_tactic : null,
     flagged_turn_ids,
   };
