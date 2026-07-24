@@ -50,7 +50,7 @@ export default function App() {
       const data = await analyzeDemo();
       setResult(data);
     } catch (err) {
-      setError(err.message || 'Demo failed. Is the backend running?');
+      setError(err.message || 'Demo failed. Is the backend server running?');
     } finally {
       setLoading(false);
     }
@@ -62,97 +62,105 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen relative selection:bg-indigo-500/30">
-      {/* Background Glow Mesh (mdmehedihasan.us style) */}
+    <div className="w-full min-h-screen flex flex-col relative selection:bg-indigo-500/30">
+      {/* Background Glow Mesh */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
         <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[450px] rounded-full blur-[140px] opacity-25 pointer-events-none"
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[750px] h-[450px] rounded-full blur-[140px] opacity-20 pointer-events-none"
           style={{
             background: 'radial-gradient(circle, #6366f1 0%, #818cf8 40%, transparent 75%)',
           }}
         />
       </div>
 
-      {/* Floating Center Navbar (mdmehedihasan.us signature nav-pill) */}
-      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="nav-pill">
-          {/* Logo / Home */}
+      {/* Top Fixed Full-Width Navbar */}
+      <header className="fixed top-0 inset-x-0 z-50 nav-pill-container border-b border-[var(--border)]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          {/* Logo & Brand */}
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/10 transition-all"
+            className="flex items-center gap-2.5 text-left hover:opacity-90 transition-all focus:outline-none"
           >
-            <span className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[10px]">
+            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs shadow-md shadow-indigo-500/20">
               🛡️
-            </span>
-            <span className="tracking-tight">TacticDetector</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-sm tracking-tight gradient-text">
+                TacticDetector
+              </span>
+              <span className="text-[10px] text-[var(--text-3)] font-mono -mt-0.5">
+                Social Engineering AI
+              </span>
+            </div>
           </button>
 
-          <div className="h-4 w-[1px] bg-white/10 mx-1" />
+          {/* Right Controls & Links */}
+          <div className="flex items-center gap-3">
+            {/* Status Dot */}
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-2)]">
+              <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className="hidden sm:inline">{apiOnline ? 'Model Online' : 'Local Engine'}</span>
+            </div>
 
-          {/* Status Indicator */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[var(--text-2)]">
-            <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            <span>{apiOnline ? 'Model Online' : 'Local Engine'}</span>
+            {/* Portfolio Link */}
+            <a
+              href="https://mdmehedihasan.us"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline-flex text-xs font-medium px-3 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/5 transition-all"
+            >
+              Md. Mehedi Hasan
+            </a>
+
+            {/* GitHub Link */}
+            <a
+              href="https://github.com/meetmehedi/Tactic-Detector"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span>GitHub</span>
+            </a>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-xs transition-all"
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
           </div>
-
-          <div className="h-4 w-[1px] bg-white/10 mx-1" />
-
-          {/* Portfolio & GitHub Links */}
-          <a
-            href="https://mdmehedihasan.us"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[12px] font-medium px-3 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/10 transition-all"
-          >
-            Md. Mehedi Hasan
-          </a>
-
-          <a
-            href="https://github.com/meetmehedi/Tactic-Detector"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[12px] font-medium px-3 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/10 transition-all"
-          >
-            GitHub
-          </a>
-
-          {/* Theme Toggle Pill */}
-          <button
-            onClick={toggleTheme}
-            className="ml-1 p-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-xs transition-all"
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? '🌙' : '☀️'}
-          </button>
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-28 pb-16">
+      {/* Main Page Area */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16 relative z-10">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          {/* Research Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-5 bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 shadow-sm">
-            <span>🔬</span> Md. Mehedihasan AI & ML Research Lab
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4 bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 shadow-sm">
+            <span>🔬</span> Md. Mehedi Hasan AI & ML Research Project
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 gradient-text leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 gradient-text leading-tight">
             Social Engineering Tactic Detector
           </h1>
 
           <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed font-normal">
-            Interpretable multi-label NLP system designed for social engineering classification,
-            turn-by-turn conversational analysis, and SHAP token attribution heatmaps.
+            Detect manipulation tactics in multi-turn conversation transcripts using DistilBERT multi-label classification and SHAP explainability heatmaps.
           </p>
 
           {/* Taxonomy Pills */}
-          <div className="flex flex-wrap justify-center items-center gap-2 mt-6">
+          <div className="flex flex-wrap justify-center items-center gap-2 mt-5">
             {Object.entries(TACTIC_META).map(([key, meta]) => {
               if (key === 'benign') return null;
               return (
                 <div
                   key={key}
-                  className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
                   style={{
                     background: meta.bg,
                     color: meta.color,
@@ -184,16 +192,16 @@ export default function App() {
         {/* Main Content Area */}
         {!result ? (
           /* Input View */
-          <div className="max-w-4xl mx-auto animate-fade-in">
+          <div className="w-full max-w-3xl mx-auto animate-fade-in">
             <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
 
-            <footer className="mt-12 text-center text-xs text-[var(--text-3)] font-mono">
+            <footer className="mt-10 text-center text-xs text-[var(--text-3)] font-mono">
               Designed by Md. Mehedi Hasan • DistilBERT Backbone • SHAP Explainability Architecture
             </footer>
           </div>
         ) : (
           /* Results View */
-          <div className="animate-fade-in flex flex-col gap-6">
+          <div className="animate-fade-in flex flex-col gap-6 w-full">
             {/* Top Toolbar */}
             <div className="glass p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <RiskBadge
@@ -210,9 +218,9 @@ export default function App() {
             </div>
 
             {/* Main Responsive Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
               {/* Turn-by-Turn Analysis (Left Column) */}
-              <div className="lg:col-span-8 order-2 lg:order-1 flex flex-col gap-4">
+              <div className="lg:col-span-8 order-2 lg:order-1 flex flex-col gap-4 w-full">
                 <div className="flex items-center justify-between px-1">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-2)] flex items-center gap-2">
                     <span>💬</span> Turn-by-Turn Transcript Analysis ({result.turns.length} turns)
@@ -226,7 +234,7 @@ export default function App() {
               </div>
 
               {/* Sidebar Risk Summary (Right Column) */}
-              <div className="lg:col-span-4 order-1 lg:order-2">
+              <div className="lg:col-span-4 order-1 lg:order-2 w-full">
                 <TacticTimeline result={result} />
               </div>
             </div>
