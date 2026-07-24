@@ -13,12 +13,20 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 
-from app.models import AnalyzeRequest, AnalyzeResponse, HealthResponse
-from app.mock_inference import (
-    analyze_transcript,
-    compute_risk_score,
-    get_dominant_tactic,
-)
+try:
+    from app.inference import (
+        analyze_transcript,
+        compute_risk_score,
+        get_dominant_tactic,
+    )
+    print("✅ Loaded real model inference module.")
+except Exception as e:
+    print(f"⚠️ Real model loading failed ({e}), falling back to mock inference.")
+    from app.mock_inference import (
+        analyze_transcript,
+        compute_risk_score,
+        get_dominant_tactic,
+    )
 from app.database import init_db, get_db, log_analysis
 
 # ─── App Setup ────────────────────────────────────────────────────────────────

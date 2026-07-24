@@ -36,14 +36,30 @@ _tokenizer = None
 _model = None
 
 
+def _get_model_path() -> str:
+    env_path = os.getenv("MODEL_PATH")
+    candidates = [
+        env_path,
+        "./training/checkpoints/best_model",
+        "../best_model",
+        "./best_model",
+        os.path.join(os.path.dirname(__file__), "..", "..", "best_model"),
+    ]
+    for c in candidates:
+        if c and os.path.exists(c):
+            return c
+    return env_path or "./training/checkpoints/best_model"
+
+
 def _load_model():
     global _tokenizer, _model
+    model_path = _get_model_path()
     if _tokenizer is None:
-        logger.info("Loading tokenizer from %s", MODEL_PATH)
-        _tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+        logger.info("Loading tokenizer from %s", model_path)
+        _tokenizer = AutoTokenizer.from_pretrained(model_path)
     if _model is None:
-        logger.info("Loading model from %s", MODEL_PATH)
-        _model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+        logger.info("Loading model from %s", model_path)
+        _model = AutoModelForSequenceClassification.from_pretrained(model_path)
         _model.eval()
     return _tokenizer, _model
 
