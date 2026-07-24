@@ -169,6 +169,26 @@ html, body {
   border-color: var(--border-hover);
 }
 
+/* Glass card — used by TurnAnalysis and TacticTimeline */
+.glass {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.glass-interactive {
+  cursor: default;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.glass-interactive:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
 /* ══════════════════════════════════════════
    TRANSCRIPT INPUT CARD
    Self-contained, no external class mixing
