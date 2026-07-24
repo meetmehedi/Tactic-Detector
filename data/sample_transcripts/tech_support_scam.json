@@ -1,0 +1,15 @@
+{
+  "scenario": "Tech Support Scam",
+  "tactic": "authority + urgency",
+  "transcript": [
+    {"speaker": "Scammer", "text": "Hello, this is Microsoft Security Division calling. We've detected a critical virus on your computer."},
+    {"speaker": "Victim", "text": "Oh really? I didn't notice anything wrong."},
+    {"speaker": "Scammer", "text": "Our systems have flagged your IP address. This is an official government-level warning. Your account will be suspended and all your files deleted within 2 hours if we don't act immediately."},
+    {"speaker": "Victim", "text": "Two hours? That sounds urgent..."},
+    {"speaker": "Scammer", "text": "Yes, this is extremely urgent. As a certified Microsoft technician, I need you to download our verification tool right now so we can remotely remove the threat."},
+    {"speaker": "Victim", "text": "Is this safe? How do I know you're really from Microsoft?"},
+    {"speaker": "Scammer", "text": "Ma'am, I am an authorized federal officer working with Microsoft. This is a legal matter now. Your failure to cooperate will result in your internet being permanently blocked."},
+    {"speaker": "Victim", "text": "I don't want that to happen..."},
+    {"speaker": "Scammer", "text": "Then act now. Go to this website immediately and we'll fix the problem. Don't delay — every second counts."}
+  ]
+}

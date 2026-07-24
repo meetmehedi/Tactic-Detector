@@ -1,0 +1,74 @@
+Social Engineering Tactic Detector — Technical Architecture & Build Plan
+System Overview
+A pipeline that takes a conversation transcript, classifies manipulation tactics turn-by-turn, and shows why — with a working demo you can link everywhere (portfolio, papers, applications).
+
+Architecture
+┌─────────────────┐     ┌──────────────────┐     ┌───────────────────┐
+│  React Frontend  │────▶│  FastAPI Backend  │────▶│  Model Inference   │
+│  (paste/upload    │◀────│  (REST API)       │◀────│  (DistilBERT +     │
+│   transcript)     │     │                    │     │   SHAP explainer)  │
+└─────────────────┘     └──────────────────┘     └───────────────────┘
+                                   │
+                                   ▼
+                          ┌──────────────────┐
+                          │  PostgreSQL/SQLite │
+                          │  (logs, demo data)  │
+                          └──────────────────┘
+
+Phase 1 — Dataset Construction (Weeks 1-3)
+Taxonomy (Cialdini-based, defensible in a paper):
+* Urgency/Scarcity ("act now, limited time")
+* Authority impersonation ("this is your bank/the police")
+* Isolation ("don't tell anyone, keep this between us")
+* Reciprocity/Trust-building ("I helped you, now...")
+* Emotional manipulation (fear, guilt, romance)
+* Neutral/benign (control class)
+Generation approach:
+1. Use an LLM (via API) to generate ~150-200 multi-turn synthetic dialogues per tactic category, with system prompts specifying scam type (romance, tech support, phishing call, fake authority) — explicitly framed as safety research so the LLM cooperates.
+2. Turn-level labeling: each conversational turn gets a tactic label (multi-label — a turn can carry more than one tactic).
+3. Add a "benign conversation" class from public dialogue datasets (e.g., DailyDialog) as negative examples.
+4. Manual spot-check ~10% for quality/realism — note this as a limitation in the paper (synthetic data caveat).
+Output: ~1,000-1,500 labeled turns, JSON format: {conversation_id, turn_id, speaker, text, tactics: [...]}
+
+Phase 2 — Model (Weeks 3-6)
+* Base model: DistilBERT (you already have experience here) fine-tuned for multi-label sequence classification per turn.
+* Context handling: Feed each turn concatenated with 1-2 prior turns (sliding window) so the model has conversational context, not just isolated sentences.
+* Explainability: Integrate SHAP or Captum for token-level attribution — highlight which words triggered each tactic label.
+* Training: Standard fine-tuning, 80/10/10 split, track F1 per tactic class (expect class imbalance — use weighted loss).
+
+Phase 3 — Backend API (Week 6-7)
+# FastAPI skeleton
+POST /analyze
+  Input: {"transcript": [{"speaker": "A", "text": "..."}, ...]}
+  Output: {
+    "turns": [
+      {"turn_id": 0, "tactics": ["urgency"], "confidence": 0.87,
+       "highlighted_tokens": [...]},
+      ...
+    ],
+    "overall_risk_score": 0.72
+  }
+* Model served via transformers pipeline or ONNX-exported for speed.
+* Simple rate limiting + logging for demo usage (this usage data becomes useful for your paper's "real-world validation" section later).
+
+Phase 4 — Frontend (Week 7-8)
+* React app: paste-box or file upload for transcript.
+* Render each turn with color-coded highlights per tactic (like a "heat map" over the conversation).
+* Sidebar showing tactic timeline (visual — good for demo screenshots in your paper/portfolio).
+* Deploy on Vercel/Netlify (frontend) + Render/Railway (backend) — free tiers work for a demo.
+
+Phase 5 — Polish for Portfolio + Paper (Week 8-10)
+* Write a clean README + architecture diagram for GitHub.
+* Record a 60-90 second demo video/GIF for your portfolio site.
+* Package the dataset + code for release (GitHub + optionally HuggingFace Datasets).
+* This becomes your Methods + Experiments sections directly — you're writing the paper as you build.
+
+Tech stack summary
+Layer	Tool
+Model	DistilBERT/RoBERTa + SHAP
+Backend	FastAPI + Python
+Frontend	React + Tailwind
+Hosting	Vercel + Render (free tier)
+Dataset	LLM-generated + DailyDialog negatives
+Total realistic timeline: ~10 weeks part-time alongside coursework.
+Want me to write the actual starter code (FastAPI backend + model training script) so you can start building this week?

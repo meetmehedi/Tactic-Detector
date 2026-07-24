@@ -1,0 +1,17 @@
+{
+  "scenario": "Romance Scam",
+  "tactic": "emotional + urgency + isolation",
+  "transcript": [
+    {"speaker": "Scammer", "text": "Hey beautiful, I've been thinking about you all day. You're the only one who truly understands me."},
+    {"speaker": "Victim", "text": "Aw, that's sweet. I've been thinking about you too."},
+    {"speaker": "Scammer", "text": "I need to tell you something. There's been an emergency with my offshore account — I'm stranded and can't access my funds. I'm scared."},
+    {"speaker": "Victim", "text": "Oh no, what happened? Are you okay?"},
+    {"speaker": "Scammer", "text": "The bank froze everything. I only need $2,000 to get the release fee and I can fly home to be with you. This is urgent — they said I have 24 hours or I lose everything."},
+    {"speaker": "Victim", "text": "That sounds serious. Can't your family help?"},
+    {"speaker": "Scammer", "text": "Please don't tell anyone about this. I'm embarrassed and I don't want my family to know about my situation. You're the only one I trust. Just between us, okay?"},
+    {"speaker": "Victim", "text": "I understand. I just want to make sure you're safe."},
+    {"speaker": "Scammer", "text": "After everything we've shared, everything I've done for you... I just need you to help me one time. I'm suffering here alone and I'm afraid."},
+    {"speaker": "Victim", "text": "I... I don't know. It's a lot of money."},
+    {"speaker": "Scammer", "text": "Act now please. The deadline is tonight. I can't lose you and my freedom at the same time. I love you."}
+  ]
+}
