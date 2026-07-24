@@ -18,7 +18,7 @@ function RiskMeter({ score }) {
             cy="55"
             r="45"
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
+            stroke="var(--border)"
             strokeWidth="9"
           />
           <circle
@@ -34,7 +34,7 @@ function RiskMeter({ score }) {
             className="risk-ring transition-all duration-1000"
             style={{
               '--offset': offset,
-              filter: `drop-shadow(0 0 10px ${color}88)`,
+              filter: `drop-shadow(0 0 8px ${color}88)`,
             }}
           />
         </svg>
@@ -43,14 +43,14 @@ function RiskMeter({ score }) {
           <span className="text-3xl font-extrabold font-mono tracking-tight" style={{ color }}>
             {pct}%
           </span>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-0.5">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-3)] mt-0.5">
             Risk Index
           </span>
         </div>
       </div>
 
       <div
-        className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
+        className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
         style={{
           background: `${color}18`,
           color: color,
@@ -69,7 +69,6 @@ export default function TacticTimeline({ result }) {
 
   const { turns, overall_risk_score, dominant_tactic, flagged_turn_ids } = result;
 
-  // Compute per-tactic counts
   const tacticCounts = {};
   for (const turn of turns) {
     for (const t of turn.tactics || []) {
@@ -102,14 +101,14 @@ export default function TacticTimeline({ result }) {
   return (
     <div className="flex flex-col gap-5 sticky top-24">
       {/* Overall Risk Score Card */}
-      <div className="glass rounded-3xl p-6 flex flex-col items-center gap-4 text-center shadow-xl">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
+      <div className="card-futuristic p-6 flex flex-col items-center gap-4 text-center shadow-xl">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--text-3)]">
           Overall Risk Assessment
         </h3>
         <RiskMeter score={overall_risk_score} />
-        <div className="w-full pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+        <div className="w-full pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-2)]">
           <span>Flagged Turns:</span>
-          <span className="font-mono font-bold text-red-400">
+          <span className="font-mono font-bold text-red-500">
             {flagged_turn_ids?.length || 0} / {turns.length}
           </span>
         </div>
@@ -117,12 +116,12 @@ export default function TacticTimeline({ result }) {
 
       {/* Primary Tactic Card */}
       {dominant_tactic && (
-        <div className="glass rounded-2xl p-5 animate-fade-in shadow-md">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+        <div className="card-futuristic p-5 animate-fade-in shadow-md">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)] mb-2">
             Dominant Manipulation Strategy
           </p>
           <div className="flex items-center gap-3">
-            <span className="text-3xl p-2 rounded-2xl bg-slate-900 border border-slate-800">
+            <span className="text-3xl p-2 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
               {TACTIC_META[dominant_tactic]?.icon}
             </span>
             <div>
@@ -132,7 +131,7 @@ export default function TacticTimeline({ result }) {
               >
                 {TACTIC_META[dominant_tactic]?.label}
               </p>
-              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-xs text-[var(--text-2)] mt-0.5 line-clamp-1">
                 {TACTIC_META[dominant_tactic]?.desc}
               </p>
             </div>
@@ -142,8 +141,8 @@ export default function TacticTimeline({ result }) {
 
       {/* Tactic Breakdown Progress Bars */}
       {sortedTactics.length > 0 && (
-        <div className="glass rounded-2xl p-5 shadow-md">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+        <div className="card-futuristic p-5 shadow-md">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)] mb-3">
             Strategy Frequency Breakdown
           </p>
           <div className="flex flex-col gap-3">
@@ -157,9 +156,9 @@ export default function TacticTimeline({ result }) {
                       <span>{meta.icon}</span>
                       <span>{meta.label}</span>
                     </span>
-                    <span className="font-mono text-slate-400">{count} turns ({Math.round((count/turns.length)*100)}%)</span>
+                    <span className="font-mono text-[var(--text-2)]">{count} turns ({Math.round((count/turns.length)*100)}%)</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-950 border border-slate-800 overflow-hidden">
+                  <div className="h-2 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{
@@ -177,12 +176,12 @@ export default function TacticTimeline({ result }) {
       )}
 
       {/* Interactive Conversation Map */}
-      <div className="glass rounded-2xl p-5 shadow-md">
+      <div className="card-futuristic p-5 shadow-md">
         <div className="flex justify-between items-center mb-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-3)]">
             Interactive Turn Map
           </p>
-          <span className="text-[10px] text-slate-500 font-mono">Click to jump</span>
+          <span className="text-[10px] text-[var(--text-3)] font-mono">Click to jump</span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
@@ -197,10 +196,10 @@ export default function TacticTimeline({ result }) {
                 type="button"
                 onClick={() => handleScrollToTurn(turn.turn_id)}
                 title={`Turn #${i + 1} (${turn.speaker}): ${turn.tactics?.join(', ')}`}
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold transition-all hover:scale-125 hover:z-20 cursor-pointer"
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold transition-all hover:scale-125 hover:z-20 cursor-pointer border-0"
                 style={{
-                  background: isFlagged ? meta.color : 'rgba(255,255,255,0.08)',
-                  color: isFlagged ? '#000' : '#888',
+                  background: isFlagged ? meta.color : 'var(--surface-2)',
+                  color: isFlagged ? '#fff' : 'var(--text-2)',
                   boxShadow: isFlagged ? `0 0 6px ${meta.color}99` : 'none',
                 }}
               >
@@ -215,7 +214,7 @@ export default function TacticTimeline({ result }) {
       <div className="flex gap-2">
         <button
           onClick={handleCopyJSON}
-          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-all flex items-center justify-center gap-1.5"
+          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <span>{copied ? '✅' : '📋'}</span>
           <span>{copied ? 'Copied!' : 'Copy Data'}</span>
@@ -223,7 +222,7 @@ export default function TacticTimeline({ result }) {
 
         <button
           onClick={handleDownloadJSON}
-          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-all flex items-center justify-center gap-1.5"
+          className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <span>📥</span>
           <span>Export JSON</span>

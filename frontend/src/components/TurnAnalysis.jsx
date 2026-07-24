@@ -3,7 +3,7 @@ import { TACTIC_META } from '../api';
 
 function TokenHighlight({ token, score }) {
   const [showTooltip, setShowTooltip] = useState(false);
-  if (score < 0.2) return <span>{token} </span>;
+  if (score < 0.2) return <span className="break-words [overflow-wrap:anywhere]">{token} </span>;
 
   const alpha = Math.min(score * 0.7, 0.85);
   const bg =
@@ -16,18 +16,18 @@ function TokenHighlight({ token, score }) {
   const textColor = score > 0.5 ? '#ffffff' : '#f3f4f6';
 
   return (
-    <span className="relative inline-block">
+    <span className="relative inline-block break-words [overflow-wrap:anywhere]">
       <span
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onClick={() => setShowTooltip(!showTooltip)}
-        className="token-highlight font-medium px-1 rounded transition-all duration-150 cursor-pointer"
+        className="token-highlight font-medium px-1 rounded transition-all duration-150 cursor-pointer break-words [overflow-wrap:anywhere]"
         style={{ background: bg, color: textColor }}
       >
         {token}
       </span>
       {showTooltip && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-30 px-2.5 py-1 text-[11px] font-mono rounded-lg bg-slate-900 text-purple-200 border border-purple-500/40 shadow-2xl whitespace-nowrap pointer-events-none animate-fade-in">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-30 px-2.5 py-1 text-[11px] font-mono rounded-lg bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] shadow-2xl whitespace-nowrap pointer-events-none animate-fade-in">
           SHAP score: {(score * 100).toFixed(0)}%
         </span>
       )}
@@ -62,7 +62,6 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
 
   const flaggedSet = new Set(flaggedIds || []);
 
-  // Filter turns
   const filteredTurns = turns.filter((turn) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -76,17 +75,17 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
   });
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 w-full max-w-full overflow-hidden">
       {/* Filter & Search Bar */}
       <div className="glass p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 cursor-pointer ${
               activeFilter === 'all'
-                ? 'bg-indigo-600/30 text-indigo-200 border border-indigo-500/50 shadow-sm'
-                : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/5'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]'
             }`}
           >
             All Turns ({turns.length})
@@ -94,10 +93,10 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
 
           <button
             onClick={() => setActiveFilter('flagged')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 cursor-pointer ${
               activeFilter === 'flagged'
-                ? 'bg-red-600/30 text-red-200 border border-red-500/50 shadow-sm'
-                : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/5'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]'
             }`}
           >
             🚨 Flagged ({flaggedSet.size})
@@ -111,13 +110,11 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
               <button
                 key={key}
                 onClick={() => setActiveFilter(key)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all ${
-                  activeFilter === key ? 'shadow-sm' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/5'
-                }`}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all border-0 cursor-pointer"
                 style={{
-                  background: activeFilter === key ? meta.bg : 'transparent',
-                  color: activeFilter === key ? meta.color : undefined,
-                  border: `1px solid ${activeFilter === key ? meta.color + '60' : 'transparent'}`,
+                  background: activeFilter === key ? meta.bg : 'var(--surface-2)',
+                  color: activeFilter === key ? meta.color : 'var(--text-2)',
+                  border: activeFilter === key ? `1px solid ${meta.color}60` : '1px solid var(--border)',
                 }}
               >
                 <span>{meta.icon}</span>
@@ -132,7 +129,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLegend(!showLegend)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center gap-1 whitespace-nowrap"
+            className="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center gap-1 whitespace-nowrap cursor-pointer"
           >
             <span>💡</span> Highlight Info
           </button>
@@ -148,7 +145,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] hover:text-[var(--text-1)] text-xs border-0 bg-transparent cursor-pointer"
               >
                 ✕
               </button>
@@ -180,7 +177,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
           No turns match the current filter or search query.
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-full max-w-full overflow-hidden">
           {filteredTurns.map((turn, idx) => {
             const isFlagged = flaggedSet.has(turn.turn_id);
             const isScammer =
@@ -193,32 +190,32 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
               <div
                 id={`turn-${turn.turn_id}`}
                 key={turn.turn_id}
-                className={`glass glass-interactive p-5 sm:p-6 rounded-2xl transition-all duration-300 ${
+                className={`glass glass-interactive p-5 sm:p-6 rounded-2xl transition-all duration-300 w-full max-w-full overflow-hidden ${
                   isFlagged ? 'border-red-900/40 bg-red-950/10' : ''
                 }`}
                 style={{ animationDelay: `${idx * 40}ms` }}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black uppercase shadow-sm"
+                      className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black uppercase shadow-sm"
                       style={{
                         background: isScammer
                           ? 'linear-gradient(135deg, rgba(239,68,68,0.3), rgba(185,28,28,0.2))'
                           : 'linear-gradient(135deg, rgba(59,130,246,0.3), rgba(29,78,216,0.2))',
-                        color: isScammer ? '#fca5a5' : '#93c5fd',
+                        color: isScammer ? '#ef4444' : '#3b82f6',
                         border: `1px solid ${isScammer ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)'}`,
                       }}
                     >
                       {turn.speaker[0] || 'U'}
                     </div>
 
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span
-                          className="font-bold text-sm"
-                          style={{ color: isScammer ? '#fca5a5' : '#93c5fd' }}
+                          className="font-bold text-sm truncate"
+                          style={{ color: isScammer ? '#ef4444' : '#3b82f6' }}
                         >
                           {turn.speaker}
                         </span>
@@ -229,7 +226,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {isFlagged && (
                       <span className="px-2.5 py-1 rounded-full font-mono text-xs font-bold bg-red-950/70 text-red-400 border border-red-800/60 shadow-sm">
                         {(turn.confidence * 100).toFixed(0)}% risk
@@ -238,21 +235,21 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
 
                     <button
                       onClick={() => setExpandedTurn(isExpanded ? null : turn.turn_id)}
-                      className="text-xs px-3 py-1 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all"
+                      className="text-xs px-3 py-1 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all cursor-pointer"
                     >
                       {isExpanded ? 'Hide Scores ▲' : 'Scores ▼'}
                     </button>
                   </div>
                 </div>
 
-                {/* Text Content with SHAP Token Highlights */}
-                <p className="text-sm leading-relaxed text-[var(--text-1)] font-normal mb-4">
+                {/* Text Content with SHAP Token Highlights & Guaranteed Line Wrapping */}
+                <div className="text-sm leading-relaxed text-[var(--text-1)] font-normal mb-4 break-words [overflow-wrap:anywhere] max-w-full overflow-hidden">
                   {turn.highlighted_tokens?.length > 0
                     ? turn.highlighted_tokens.map((ht, i) => (
                         <TokenHighlight key={i} token={ht.token} score={ht.score} />
                       ))
                     : turn.text}
-                </p>
+                </div>
 
                 {/* Tactic Badges */}
                 <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border)]">
