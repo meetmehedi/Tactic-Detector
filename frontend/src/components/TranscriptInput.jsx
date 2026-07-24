@@ -9,7 +9,7 @@ Scammer: Don't tell anyone about this call. Just read your 6-digit passcode to m
 
 export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   const [text, setText] = useState('');
-  const [mode, setMode] = useState('text'); // 'text' | 'json'
+  const [mode, setMode] = useState('text');
   const [error, setError] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const fileRef = useRef();
@@ -54,12 +54,12 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   }
 
   return (
-    <div className="card-futuristic p-6 sm:p-8 flex flex-col gap-6 shadow-2xl transition-all">
-      {/* Top Controls: Presets & Format Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="card-futuristic p-6 sm:p-8 flex flex-col gap-6 shadow-2xl overflow-hidden w-full box-border">
+      {/* Top Header: Preset Chips & Format Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
         {/* Preset Chips */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wider mr-1">
+          <span className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider mr-1">
             Presets:
           </span>
           {PRESET_SCENARIOS.map((preset) => (
@@ -67,15 +67,15 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
               key={preset.id}
               type="button"
               onClick={() => handlePreset(preset)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[var(--surface-2)] hover:bg-indigo-950/40 text-[var(--text-2)] hover:text-white border border-[var(--border)] hover:border-indigo-500/40 transition-all duration-200 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all cursor-pointer"
             >
               {preset.title}
             </button>
           ))}
         </div>
 
-        {/* Format Selector */}
-        <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto">
+        {/* Mode Selector */}
+        <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto flex-shrink-0">
           {['text', 'json'].map((m) => (
             <button
               key={m}
@@ -93,10 +93,10 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
         </div>
       </div>
 
-      {/* Main Textarea */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {/* Main Textarea Container */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
         <div
-          className={`relative rounded-2xl transition-all duration-200 ${
+          className={`relative rounded-2xl transition-all duration-200 w-full overflow-hidden ${
             dragActive ? 'ring-2 ring-indigo-500 bg-indigo-950/20' : ''
           }`}
           onDragOver={(e) => {
@@ -118,11 +118,11 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
                 ? '{\n  "transcript": [\n    {"speaker": "Scammer", "text": "Urgent alert..."},\n    {"speaker": "Victim", "text": "What do I do?"}\n  ]\n}'
                 : PLACEHOLDER_TEXT
             }
-            rows={10}
-            className="w-full rounded-2xl p-5 text-sm outline-none font-mono bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-1)] placeholder:text-[var(--text-3)] focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all leading-relaxed"
+            rows={9}
+            className="w-full rounded-2xl p-5 text-sm outline-none font-mono bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-1)] placeholder:text-[var(--text-3)] focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all leading-relaxed resize-none box-border"
           />
 
-          <div className="absolute bottom-4 right-4 text-[11px] font-mono text-[var(--text-3)] pointer-events-none">
+          <div className="absolute bottom-3 right-4 text-[11px] font-mono text-[var(--text-3)] pointer-events-none bg-[var(--surface-2)]/80 px-2 py-0.5 rounded">
             {text.split('\n').filter((l) => l.trim()).length} turns • {text.length} chars
           </div>
         </div>
@@ -135,12 +135,12 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
           </div>
         )}
 
-        {/* Action Controls */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        {/* Bottom Action Controls */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full">
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="px-5 py-3 rounded-full text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="px-5 py-3 rounded-full text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>📎</span> Attach File
           </button>
@@ -156,7 +156,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
             type="button"
             onClick={onDemo}
             disabled={loading}
-            className="px-5 py-3 rounded-full text-xs font-semibold bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-700/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="px-5 py-3 rounded-full text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-500 border border-emerald-500/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <span>▶</span> Quick Demo
           </button>
