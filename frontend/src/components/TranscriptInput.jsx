@@ -54,9 +54,9 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   }
 
   return (
-    <div className="card-futuristic p-6 sm:p-8 flex flex-col gap-6 shadow-2xl overflow-hidden w-full box-border">
-      {/* Top Header: Preset Chips & Format Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+    <div className="card-futuristic p-6 sm:p-8 flex flex-col gap-6 shadow-2xl rounded-3xl w-full box-border">
+      {/* Card Header: Presets & Format Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full pb-4 border-b border-[var(--border)]">
         {/* Preset Chips */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider mr-1">
@@ -67,7 +67,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
               key={preset.id}
               type="button"
               onClick={() => handlePreset(preset)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--text-1)] hover:bg-indigo-600 hover:text-white border border-[var(--border)] transition-all cursor-pointer"
             >
               {preset.title}
             </button>
@@ -94,9 +94,9 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
       </div>
 
       {/* Main Textarea Container */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
         <div
-          className={`relative rounded-2xl transition-all duration-200 w-full overflow-hidden ${
+          className={`relative rounded-2xl transition-all duration-200 w-full ${
             dragActive ? 'ring-2 ring-indigo-500 bg-indigo-950/20' : ''
           }`}
           onDragOver={(e) => {
@@ -118,11 +118,11 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
                 ? '{\n  "transcript": [\n    {"speaker": "Scammer", "text": "Urgent alert..."},\n    {"speaker": "Victim", "text": "What do I do?"}\n  ]\n}'
                 : PLACEHOLDER_TEXT
             }
-            rows={9}
-            className="w-full rounded-2xl p-5 text-sm outline-none font-mono bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-1)] placeholder:text-[var(--text-3)] focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all leading-relaxed resize-none box-border"
+            rows={8}
+            className="w-full rounded-2xl p-5 text-sm outline-none font-mono bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-1)] placeholder:text-[var(--text-3)] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all leading-relaxed resize-none box-border"
           />
 
-          <div className="absolute bottom-3 right-4 text-[11px] font-mono text-[var(--text-3)] pointer-events-none bg-[var(--surface-2)]/80 px-2 py-0.5 rounded">
+          <div className="absolute bottom-4 right-4 text-[11px] font-mono text-[var(--text-3)] pointer-events-none bg-[var(--surface)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
             {text.split('\n').filter((l) => l.trim()).length} turns • {text.length} chars
           </div>
         </div>
@@ -135,8 +135,8 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
           </div>
         )}
 
-        {/* Bottom Action Controls */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
+        {/* Card Footer Action Controls */}
+        <div className="pt-4 border-t border-[var(--border)] flex flex-col sm:flex-row gap-3 w-full">
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
@@ -156,7 +156,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
             type="button"
             onClick={onDemo}
             disabled={loading}
-            className="px-5 py-3 rounded-full text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-500 border border-emerald-500/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="px-5 py-3 rounded-full text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <span>▶</span> Quick Demo
           </button>
