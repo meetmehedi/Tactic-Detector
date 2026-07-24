@@ -10,14 +10,23 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [apiOnline, setApiOnline] = useState(true);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
-  // Check backend health on load
+  // Sync theme attribute on <html>
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Check backend health
   useEffect(() => {
     fetch('/api/health')
       .then((res) => res.ok)
       .then((ok) => setApiOnline(ok))
       .catch(() => setApiOnline(false));
   }, []);
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
   const handleAnalyze = useCallback(async (turns) => {
     setLoading(true);
@@ -27,7 +36,7 @@ export default function App() {
       const data = await analyzeTranscript(turns);
       setResult(data);
     } catch (err) {
-      setError(err.message || 'Analysis failed. Is the backend running on port 8000?');
+      setError(err.message || 'Analysis failed. Is the backend server running on port 8000?');
     } finally {
       setLoading(false);
     }
@@ -53,98 +62,101 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen text-slate-100 selection:bg-purple-500/30">
-      {/* Ambient background glow */}
+    <div className="min-h-screen relative selection:bg-indigo-500/30">
+      {/* Background Glow Mesh (mdmehedihasan.us style) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
         <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[140px] opacity-20 pointer-events-none"
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[450px] rounded-full blur-[140px] opacity-25 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, #7c3aed 0%, #4f46e5 50%, transparent 80%)',
-          }}
-        />
-        <div
-          className="absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full blur-[160px] opacity-15 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, #ef4444 0%, transparent 70%)',
+            background: 'radial-gradient(circle, #6366f1 0%, #818cf8 40%, transparent 75%)',
           }}
         />
       </div>
 
-      {/* Top Floating Navbar */}
-      <nav className="sticky top-0 z-50 glass border-b border-slate-800/80 backdrop-blur-xl bg-slate-950/70">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={handleReset}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-lg shadow-lg shadow-purple-500/25">
+      {/* Floating Center Navbar (mdmehedihasan.us signature nav-pill) */}
+      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+        <div className="nav-pill">
+          {/* Logo / Home */}
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/10 transition-all"
+          >
+            <span className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[10px]">
               🛡️
-            </div>
-            <div>
-              <span className="font-extrabold text-base tracking-tight gradient-text">
-                TacticDetector
-              </span>
-              <span className="hidden sm:inline-block text-[10px] ml-2 px-2 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-800/50 font-mono">
-                v1.0 ML
-              </span>
-            </div>
+            </span>
+            <span className="tracking-tight">TacticDetector</span>
+          </button>
+
+          <div className="h-4 w-[1px] bg-white/10 mx-1" />
+
+          {/* Status Indicator */}
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[var(--text-2)]">
+            <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <span>{apiOnline ? 'Model Online' : 'Local Engine'}</span>
           </div>
 
-          {/* Right Links & Status */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                apiOnline
-                  ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50'
-                  : 'bg-amber-950/60 text-amber-400 border border-amber-800/50'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-              <span className="hidden xs:inline">{apiOnline ? 'API Online' : 'Offline / Local Mock'}</span>
-            </div>
+          <div className="h-4 w-[1px] bg-white/10 mx-1" />
 
-            <a
-              href="https://github.com/meetmehedi/Tactic-Detector"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-all flex items-center gap-1.5"
-            >
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-              <span>GitHub</span>
-            </a>
-          </div>
+          {/* Portfolio & GitHub Links */}
+          <a
+            href="https://mdmehedihasan.us"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/10 transition-all"
+          >
+            Md. Mehedi Hasan
+          </a>
+
+          <a
+            href="https://github.com/meetmehedi/Tactic-Detector"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-full text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/10 transition-all"
+          >
+            GitHub
+          </a>
+
+          {/* Theme Toggle Pill */}
+          <button
+            onClick={toggleTheme}
+            className="ml-1 p-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-xs transition-all"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? '🌙' : '☀️'}
+          </button>
         </div>
-      </nav>
+      </header>
 
-      {/* Main Container */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Header Hero Section */}
-        <header className="mb-10 text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4 bg-purple-950/60 text-purple-300 border border-purple-800/50 shadow-sm">
-            <span>🧠</span> DistilBERT + SHAP Explainability Engine
+      {/* Main Content Container */}
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-28 pb-16">
+        {/* Hero Section */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          {/* Research Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-5 bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 shadow-sm">
+            <span>🔬</span> Md. Mehedihasan AI & ML Research Lab
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 gradient-text leading-tight">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 gradient-text leading-tight">
             Social Engineering Tactic Detector
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-400 leading-relaxed font-normal">
-            Analyze multi-turn conversation transcripts to identify manipulation strategies,
-            quantify scam risk, and inspect token-level attribution highlights.
+          <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed font-normal">
+            Interpretable multi-label NLP system designed for social engineering classification,
+            turn-by-turn conversational analysis, and SHAP token attribution heatmaps.
           </p>
 
-          {/* Interactive Category Badges */}
+          {/* Taxonomy Pills */}
           <div className="flex flex-wrap justify-center items-center gap-2 mt-6">
             {Object.entries(TACTIC_META).map(([key, meta]) => {
               if (key === 'benign') return null;
               return (
                 <div
                   key={key}
-                  className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
+                  className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm"
                   style={{
                     background: meta.bg,
                     color: meta.color,
-                    border: `1px solid ${meta.color}40`,
+                    border: `1px solid ${meta.color}35`,
                   }}
                   title={meta.desc}
                 >
@@ -154,63 +166,58 @@ export default function App() {
               );
             })}
           </div>
-        </header>
+        </div>
 
         {/* Global Error Banner */}
         {error && (
-          <div className="mb-8 p-4 rounded-2xl text-xs sm:text-sm font-medium bg-red-950/50 text-red-300 border border-red-800/60 shadow-lg flex items-center justify-between gap-3 animate-fade-in max-w-3xl mx-auto">
+          <div className="mb-8 p-4 rounded-2xl text-xs sm:text-sm font-medium bg-red-950/50 text-red-300 border border-red-800/60 flex items-center justify-between gap-3 animate-fade-in max-w-3xl mx-auto">
             <div className="flex items-center gap-2">
               <span>⚠️</span>
               <span>{error}</span>
             </div>
-            <button
-              onClick={() => setError('')}
-              className="text-red-400 hover:text-white font-bold"
-            >
+            <button onClick={() => setError('')} className="text-red-400 hover:text-white font-bold">
               ✕
             </button>
           </div>
         )}
 
-        {/* Main Content: Input vs Results */}
+        {/* Main Content Area */}
         {!result ? (
           /* Input View */
-          <div className="max-w-5xl mx-auto animate-fade-in">
+          <div className="max-w-4xl mx-auto animate-fade-in">
             <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
 
-            <footer className="mt-8 text-center text-xs text-slate-500 font-mono">
-              Cialdini Manipulation Taxonomy • Multi-label Classification • SHAP Heatmaps
+            <footer className="mt-12 text-center text-xs text-[var(--text-3)] font-mono">
+              Designed by Md. Mehedi Hasan • DistilBERT Backbone • SHAP Explainability Architecture
             </footer>
           </div>
         ) : (
-          /* Results View (Fully Responsive Grid) */
+          /* Results View */
           <div className="animate-fade-in flex flex-col gap-6">
             {/* Top Toolbar */}
-            <div className="glass rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="glass p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <RiskBadge
                 score={result.overall_risk_score}
                 dominantTactic={result.dominant_tactic}
               />
 
-              <div className="flex items-center gap-3 self-end sm:self-auto">
-                <button
-                  onClick={handleReset}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-purple-900/30 hover:bg-purple-800/40 text-purple-200 border border-purple-500/40 transition-all flex items-center gap-1.5 shadow-sm"
-                >
-                  <span>✏️</span> New Analysis
-                </button>
-              </div>
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 transition-all flex items-center gap-1.5 shadow-sm"
+              >
+                <span>✏️</span> New Analysis
+              </button>
             </div>
 
             {/* Main Responsive Grid Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Turn-by-Turn Analysis (Left Column on Desktop, Bottom on Mobile) */}
+              {/* Turn-by-Turn Analysis (Left Column) */}
               <div className="lg:col-span-8 order-2 lg:order-1 flex flex-col gap-4">
                 <div className="flex items-center justify-between px-1">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                    <span>💬</span> Turn-by-Turn Analysis ({result.turns.length} turns)
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-2)] flex items-center gap-2">
+                    <span>💬</span> Turn-by-Turn Transcript Analysis ({result.turns.length} turns)
                   </h2>
-                  <span className="text-[11px] text-slate-500 font-mono">
+                  <span className="text-[11px] text-[var(--text-3)] font-mono">
                     {result.flagged_turn_ids?.length || 0} Flagged
                   </span>
                 </div>
@@ -218,7 +225,7 @@ export default function App() {
                 <TurnAnalysis turns={result.turns} flaggedIds={result.flagged_turn_ids} />
               </div>
 
-              {/* Overview Sidebar (Right Column on Desktop, Top Summary on Mobile) */}
+              {/* Sidebar Risk Summary (Right Column) */}
               <div className="lg:col-span-4 order-1 lg:order-2">
                 <TacticTimeline result={result} />
               </div>

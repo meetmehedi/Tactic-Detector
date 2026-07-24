@@ -17,7 +17,10 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   function handleSubmit(e) {
     e?.preventDefault();
     setError('');
-    if (!text.trim()) { setError('Please paste a transcript or pick a preset scenario.'); return; }
+    if (!text.trim()) {
+      setError('Please paste a transcript or select a preset scenario.');
+      return;
+    }
     try {
       let turns;
       if (mode === 'json') {
@@ -26,7 +29,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
         if (!turns?.length) throw new Error('JSON must contain a "transcript" array of turns.');
       } else {
         turns = parseTranscriptText(text);
-        if (!turns.length) throw new Error('Could not parse transcript. Use "Speaker: text" per line.');
+        if (!turns.length) throw new Error('Could not parse transcript. Use "Speaker: text" format per line.');
       }
       onAnalyze(turns);
     } catch (err) {
@@ -51,30 +54,30 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
   }
 
   return (
-    <div className="glass rounded-3xl p-6 lg:p-8 flex flex-col gap-6 shadow-2xl transition-all">
-      {/* Top Title & Presets */}
+    <div className="glass p-6 sm:p-8 flex flex-col gap-6 shadow-2xl transition-all">
+      {/* Header & Presets */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-bold text-[var(--text-1)] flex items-center gap-2">
               <span>✍️</span> Transcript Input
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[var(--text-2)] mt-1 font-normal">
               Paste conversation turns or pick a pre-loaded real scam scenario
             </p>
           </div>
 
           {/* Mode Switcher */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/80 border border-slate-800 self-start sm:self-auto">
-            {['text', 'json'].map(m => (
+          <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto">
+            {['text', 'json'].map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMode(m)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider transition-all ${
                   mode === m
-                    ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 shadow-sm'
+                    : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
                 }`}
               >
                 {m} Format
@@ -84,14 +87,14 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
         </div>
 
         {/* Preset Chips */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
-          <span className="text-xs text-slate-400 self-center font-medium mr-1">Presets:</span>
+        <div className="flex flex-wrap gap-2 pt-3 border-t border-[var(--border)]">
+          <span className="text-xs text-[var(--text-2)] self-center font-medium mr-1">Presets:</span>
           {PRESET_SCENARIOS.map((preset) => (
             <button
               key={preset.id}
               type="button"
               onClick={() => handlePreset(preset)}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/50 hover:bg-purple-900/30 text-slate-300 hover:text-purple-200 border border-slate-700/50 hover:border-purple-500/30 transition-all duration-200"
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[var(--surface-2)] hover:bg-indigo-950/40 text-[var(--text-2)] hover:text-indigo-200 border border-[var(--border)] hover:border-indigo-500/40 transition-all duration-200"
             >
               {preset.title}
             </button>
@@ -103,9 +106,12 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div
           className={`relative rounded-2xl transition-all duration-200 ${
-            dragActive ? 'ring-2 ring-purple-500 bg-purple-950/20' : ''
+            dragActive ? 'ring-2 ring-indigo-500 bg-indigo-950/20' : ''
           }`}
-          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
           onDragLeave={() => setDragActive(false)}
           onDrop={(e) => {
             e.preventDefault();
@@ -121,18 +127,18 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
                 ? '{\n  "transcript": [\n    {"speaker": "Scammer", "text": "Urgent alert..."},\n    {"speaker": "Victim", "text": "What do I do?"}\n  ]\n}'
                 : PLACEHOLDER_TEXT
             }
-            rows={9}
-            className="w-full rounded-2xl p-5 text-sm resize-none outline-none font-mono bg-slate-950/60 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:border-purple-500/60 focus:ring-1 focus:ring-purple-500/40 transition-all duration-200 leading-relaxed"
+            rows={10}
+            className="w-full rounded-2xl p-5 text-sm resize-none outline-none font-mono bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-1)] placeholder:text-[var(--text-3)] focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 transition-all duration-200 leading-relaxed"
           />
 
-          <div className="absolute bottom-3 right-4 text-[11px] font-mono text-slate-500 pointer-events-none">
-            {text.split('\n').filter(l => l.trim()).length} turns • {text.length} chars
+          <div className="absolute bottom-3 right-4 text-[11px] font-mono text-[var(--text-3)] pointer-events-none">
+            {text.split('\n').filter((l) => l.trim()).length} turns • {text.length} chars
           </div>
         </div>
 
-        {/* Error message */}
+        {/* Error Message */}
         {error && (
-          <div className="px-4 py-3 rounded-xl text-xs font-medium bg-red-950/40 text-red-300 border border-red-800/50 flex items-center gap-2 animate-fade-in">
+          <div className="px-4 py-3 rounded-2xl text-xs font-medium bg-red-950/40 text-red-300 border border-red-800/50 flex items-center gap-2 animate-fade-in">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
@@ -143,7 +149,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="px-5 py-3 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 hover:border-slate-500 transition-all flex items-center justify-center gap-2 shadow-sm"
+            className="px-5 py-3 rounded-full text-xs font-semibold bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 shadow-sm"
           >
             <span>📎</span> Attach File
           </button>
@@ -159,7 +165,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
             type="button"
             onClick={onDemo}
             disabled={loading}
-            className="px-5 py-3 rounded-xl text-xs font-semibold bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-700/40 hover:border-emerald-500/50 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+            className="px-5 py-3 rounded-full text-xs font-semibold bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-700/40 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
           >
             <span>▶</span> Quick Demo
           </button>
@@ -167,11 +173,11 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
           <button
             type="submit"
             disabled={loading || !text.trim()}
-            className="flex-1 py-3 px-6 rounded-xl text-sm font-bold text-white transition-all shadow-lg hover:shadow-purple-500/25 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 py-3 px-6 rounded-full text-sm font-bold text-white transition-all shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{
               background: loading
-                ? 'rgba(124, 58, 237, 0.3)'
-                : 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                ? 'rgba(99, 102, 241, 0.3)'
+                : 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
             }}
           >
             {loading ? (
@@ -184,7 +190,7 @@ export default function TranscriptInput({ onAnalyze, onDemo, loading }) {
               </>
             ) : (
               <>
-                <span>⚡</span> Analyze Social Tactics
+                <span>⚡</span> Run Tactic Analysis
               </>
             )}
           </button>
