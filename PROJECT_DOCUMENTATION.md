@@ -168,9 +168,16 @@ Tactic-Detector/
 
 ---
 
-## 📈 8. How to Run Locally
+## 📈 8. Live Access & Local Development
 
-### Backend Setup (Python 3.11)
+### 🌐 Live Production Access
+No local setup is required. Access the live application directly at:
+**[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
+
+### 💻 Optional Local Development Setup
+If you want to run or train the backend locally:
+
+#### Backend Setup (Python 3.11)
 ```bash
 cd backend
 python -m venv venv
@@ -179,13 +186,13 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### Frontend Setup (Node.js)
+#### Frontend Setup (Node.js)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open **[http://localhost:5173](http://localhost:5173)** in your browser.
+Local dev server runs at **[http://localhost:5173](http://localhost:5173)**.
 
 ---
 
