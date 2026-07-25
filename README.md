@@ -89,25 +89,13 @@ For complete project documentation including dataset generation, model fine-tuni
 
 ---
 
-## 💻 Optional Local Setup
+## 🌐 Deployment & Live Access
 
-If you wish to run the full FastAPI backend server locally alongside the React frontend:
+The web application is deployed on **GitHub Pages**:
 
-### 1. Backend (FastAPI + PyTorch)
-```bash
-cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-### 2. Frontend (React + Vite)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open **[http://localhost:5173](http://localhost:5173)** in your browser.
+- **Live URL**: **[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
+- **Automated Deployment**: CI/CD pipeline via GitHub Actions (`.github/workflows/deploy.yml`) builds and publishes `frontend/dist` to the `gh-pages` branch.
+- **Client-Side Fallback**: Fully functional in any modern browser without requiring external server dependencies.
 
 ---
 

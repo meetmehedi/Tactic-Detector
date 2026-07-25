@@ -168,31 +168,13 @@ Tactic-Detector/
 
 ---
 
-## 📈 8. Live Access & Local Development
+## 🌐 8. Deployment & Live Application Access
 
-### 🌐 Live Production Access
-No local setup is required. Access the live application directly at:
-**[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
+The project is fully built, packaged, and deployed on **GitHub Pages**:
 
-### 💻 Optional Local Development Setup
-If you want to run or train the backend locally:
-
-#### Backend Setup (Python 3.11)
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-#### Frontend Setup (Node.js)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Local dev server runs at **[http://localhost:5173](http://localhost:5173)**.
+- **Live Application URL**: **[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
+- **Deployment Pipeline**: Static production bundle generated via Vite (`npm run build`), deployed automatically to the `gh-pages` branch via GitHub Actions (`.github/workflows/deploy.yml`).
+- **Execution Strategy**: Hybrid model architecture featuring browser-side fallback inference for zero-downtime execution without requiring external server hosting.
 
 ---
 
