@@ -70,7 +70,8 @@ function TacticBadge({ tactic }) {
         border: `1px solid ${meta.color}40`,
       }}
     >
-      {meta.icon} {meta.label}
+      <span style={{ opacity: 0.8, fontSize: 10, fontFamily: 'var(--mono)', fontWeight: 700 }}>{meta.code || 'BEN'}</span>
+      <span>{meta.label}</span>
     </span>
   );
 }
@@ -113,7 +114,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
             All Turns ({turns.length})
           </button>
           <button style={pill(activeFilter === 'flagged', '#ef4444')} onClick={() => setActiveFilter('flagged')}>
-            🚨 Flagged ({flaggedSet.size})
+            Flagged ({flaggedSet.size})
           </button>
           {Object.entries(TACTIC_META).map(([key, meta]) => {
             if (key === 'benign') return null;
@@ -128,7 +129,8 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
                   display: 'inline-flex', alignItems: 'center', gap: 5,
                 }}
               >
-                {meta.icon} {meta.label} <span style={{ opacity: 0.65, fontSize: 10 }}>({count})</span>
+                <span>{meta.label}</span>
+                <span style={{ opacity: 0.65, fontSize: 10 }}>({count})</span>
               </button>
             );
           })}
@@ -142,9 +144,13 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
               padding: '5px 12px', borderRadius: 100, fontSize: 11, fontWeight: 600,
               background: 'var(--surface-2)', color: 'var(--text-2)',
               border: '1px solid var(--border)', cursor: 'pointer', whiteSpace: 'nowrap',
+              display: 'inline-flex', alignItems: 'center', gap: 5,
             }}
           >
-            💡 Highlight Info
+            <svg style={{ width: 12, height: 12 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Highlight Info
           </button>
           <div style={{ position: 'relative' }}>
             <input
@@ -179,7 +185,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
           border: '1px solid rgba(99,102,241,0.25)',
           fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6,
         }}>
-          <p style={{ fontWeight: 700, color: 'var(--accent-light)', marginBottom: 8 }}>ℹ️ Token Attribution (SHAP)</p>
+          <p style={{ fontWeight: 700, color: 'var(--accent-light)', marginBottom: 8 }}>Token Attribution (SHAP)</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontFamily: 'var(--mono)', fontSize: 11 }}>
             <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(239,68,68,0.5)', color: '#fff', fontWeight: 700 }}>High Risk (&gt;65%)</span>
             <span style={{ padding: '2px 8px', borderRadius: 6, background: 'rgba(245,158,11,0.5)', color: '#fff', fontWeight: 700 }}>Medium Risk (40-65%)</span>
@@ -252,7 +258,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
                         border: '1px solid var(--border)', cursor: 'pointer',
                       }}
                     >
-                      {isExpanded ? 'Hide ▲' : 'Scores ▼'}
+                      {isExpanded ? 'Hide Scores' : 'Show Scores'}
                     </button>
                   </div>
                 </div>
@@ -291,7 +297,7 @@ export default function TurnAnalysis({ turns, flaggedIds }) {
                           border: '1px solid var(--border)',
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 11 }}>
-                            <span style={{ color: meta.color, fontWeight: 600 }}>{meta.icon} {meta.label}</span>
+                            <span style={{ color: meta.color, fontWeight: 600 }}>{meta.label}</span>
                             <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-2)' }}>{pct}%</span>
                           </div>
                           <div style={{ height: 4, borderRadius: 2, background: 'var(--surface-3)' }}>

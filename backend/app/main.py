@@ -19,9 +19,9 @@ try:
         compute_risk_score,
         get_dominant_tactic,
     )
-    print("✅ Loaded real model inference module.")
+    print("[INFO] Loaded real model inference module.")
 except Exception as e:
-    print(f"⚠️ Real model loading failed ({e}), falling back to mock inference.")
+    print(f"[WARNING] Real model loading failed ({e}), falling back to mock inference.")
     from app.mock_inference import (
         analyze_transcript,
         compute_risk_score,

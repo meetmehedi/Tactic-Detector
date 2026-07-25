@@ -3,7 +3,7 @@ import { TACTIC_META } from '../api';
 export default function RiskBadge({ score, dominantTactic }) {
   const pct = Math.round((score || 0) * 100);
   const color = score > 0.7 ? '#ef4444' : score > 0.4 ? '#f59e0b' : '#10b981';
-  const label = score > 0.7 ? '🚨 High Scam Risk' : score > 0.4 ? '⚠️ Moderate Risk' : '✅ Low / Benign';
+  const label = score > 0.7 ? 'High Scam Risk' : score > 0.4 ? 'Moderate Risk' : 'Low Risk';
   const meta = dominantTactic ? TACTIC_META[dominantTactic] : null;
 
   return (
@@ -26,7 +26,7 @@ export default function RiskBadge({ score, dominantTactic }) {
           <span className="flex items-center gap-1 font-medium text-[var(--text-2)]">
             <span>Primary:</span>
             <span style={{ color: meta.color }} className="font-semibold">
-              {meta.icon} {meta.label}
+              {meta.label}
             </span>
           </span>
         </>
@@ -34,3 +34,4 @@ export default function RiskBadge({ score, dominantTactic }) {
     </div>
   );
 }
+

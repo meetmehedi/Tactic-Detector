@@ -112,9 +112,9 @@ export default function TacticTimeline({ result }) {
             {label('Dominant Manipulation Strategy')}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{
-                fontSize: 28, padding: '8px 10px', borderRadius: 12,
-                background: 'var(--surface-2)', border: '1px solid var(--border)',
-              }}>{meta?.icon}</span>
+                fontSize: 12, fontFamily: 'var(--mono)', fontWeight: 800, padding: '8px 12px', borderRadius: 12,
+                background: `${meta?.color}18`, color: meta?.color, border: `1px solid ${meta?.color}40`,
+              }}>{meta?.code}</span>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 15, color: meta?.color }}>{meta?.label}</p>
                 <p style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 3, lineClamp: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 220 }}>{meta?.desc}</p>
@@ -135,8 +135,9 @@ export default function TacticTimeline({ result }) {
               return (
                 <div key={tactic}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5, fontSize: 12 }}>
-                    <span style={{ color: meta.color, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
-                      {meta.icon} {meta.label}
+                    <span style={{ color: meta.color, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 10, fontFamily: 'var(--mono)', opacity: 0.8 }}>[{meta.code}]</span>
+                      <span>{meta.label}</span>
                     </span>
                     <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-2)', fontSize: 11 }}>
                       {count} turns ({pct}%)
@@ -205,7 +206,10 @@ export default function TacticTimeline({ result }) {
             transition: 'background 0.2s',
           }}
         >
-          {copied ? '✅ Copied!' : '📋 Copy Data'}
+          <svg style={{ width: 13, height: 13 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+          </svg>
+          {copied ? 'Copied!' : 'Copy Data'}
         </button>
         <button
           onClick={handleDownload}
@@ -217,7 +221,10 @@ export default function TacticTimeline({ result }) {
             transition: 'background 0.2s',
           }}
         >
-          📥 Export JSON
+          <svg style={{ width: 13, height: 13 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Export JSON
         </button>
       </div>
     </div>

@@ -131,7 +131,7 @@ def main():
     for tactic, config in TACTIC_CONFIGS.items():
         scenarios = config["scenarios"]
         per_scenario = args.per_tactic // len(scenarios)
-        print(f"\n📊 Generating {args.per_tactic} dialogues for: {tactic}")
+        print(f"\n[INFO] Generating {args.per_tactic} dialogues for: {tactic}")
 
         for scenario in scenarios:
             for _ in tqdm(range(per_scenario), desc=f"  {scenario}"):
@@ -145,7 +145,7 @@ def main():
 
     # Add benign examples (~20% of total)
     benign_target = len(all_turns) // 4
-    print(f"\n📊 Adding {benign_target} benign turns from templates...")
+    print(f"\n[INFO] Adding {benign_target} benign turns from templates...")
     all_turns.extend(fetch_benign_turns(benign_target))
 
     random.shuffle(all_turns)
@@ -154,7 +154,7 @@ def main():
         for turn in all_turns:
             f.write(json.dumps(turn) + "\n")
 
-    print(f"\n✅ Saved {len(all_turns)} labeled turns → {output_path}")
+    print(f"\n[INFO] Saved {len(all_turns)} labeled turns -> {output_path}")
 
 
 if __name__ == "__main__":

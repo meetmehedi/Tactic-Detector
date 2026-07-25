@@ -192,15 +192,15 @@ def evaluate(model, loader, device, threshold=0.5):
 
 def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"\n🖥  Device: {device}")
+    print(f"\n[INFO] Device: {device}")
     if device.type == "cpu":
-        print("  ⚠  No GPU found — training will be slow. Use Google Colab for free GPU.")
+        print("  [WARNING] No GPU found — training will be slow. Use Google Colab for free GPU.")
 
     # Load data
-    print(f"\n📂 Loading data from: {args.data}")
+    print(f"\n[INFO] Loading data from: {args.data}")
     records = load_jsonl(args.data)
     if args.extra:
-        print(f"📂 Loading extra data from: {args.extra}")
+        print(f"[INFO] Loading extra data from: {args.extra}")
         extra = load_jsonl(args.extra)
         records = merge_and_deduplicate(records, extra)
 
@@ -208,7 +208,7 @@ def train(args):
 
     # Label distribution
     tactic_counts = Counter(t for r in records for t in r.get("tactics", ["benign"]))
-    print("\n📊 Tactic distribution:")
+    print("\n[INFO] Tactic distribution:")
     for t in TACTIC_LABELS:
         bar = "█" * (tactic_counts.get(t, 0) // max(max(tactic_counts.values()) // 30, 1))
         print(f"  {t:<14} {tactic_counts.get(t, 0):>6,}  {bar}")
@@ -216,13 +216,13 @@ def train(args):
     # Split 80 / 10 / 10
     train_recs, test_recs = train_test_split(records, test_size=0.2, random_state=SEED)
     val_recs, test_recs = train_test_split(test_recs, test_size=0.5, random_state=SEED)
-    print(f"\n✂  Train: {len(train_recs):,} | Val: {len(val_recs):,} | Test: {len(test_recs):,}")
+    print(f"\n[INFO] Train: {len(train_recs):,} | Val: {len(val_recs):,} | Test: {len(test_recs):,}")
 
     # Build context maps
     ctx_map = build_context_map(records)
 
     # Tokenizer + Model
-    print(f"\n🤗 Loading base model: {args.base_model}")
+    print(f"\n[INFO] Loading base model: {args.base_model}")
     tokenizer = AutoTokenizer.from_pretrained(args.base_model)
     model = AutoModelForSequenceClassification.from_pretrained(
         args.base_model,
@@ -258,7 +258,7 @@ def train(args):
     output_dir.mkdir(parents=True, exist_ok=True)
     best_val_f1 = 0.0
 
-    print(f"\n🚀 Training for {args.epochs} epochs…\n")
+    print(f"\n[INFO] Training for {args.epochs} epochs…\n")
     for epoch in range(1, args.epochs + 1):
         model.train()
         total_loss = 0.0
@@ -281,24 +281,24 @@ def train(args):
 
         val_f1, _, _ = evaluate(model, val_loader, device)
         avg_loss = total_loss / len(train_loader)
-        print(f"\n✓ Epoch {epoch}/{args.epochs}  avg_loss={avg_loss:.4f}  val_macro_F1={val_f1:.4f}")
+        print(f"\n[EPOCH {epoch}/{args.epochs}] avg_loss={avg_loss:.4f}  val_macro_F1={val_f1:.4f}")
 
         if val_f1 > best_val_f1:
             best_val_f1 = val_f1
             model.save_pretrained(output_dir)
             tokenizer.save_pretrained(output_dir)
-            print(f"  💾 Saved best model (val_F1={val_f1:.4f})\n")
+            print(f"  [SAVED] Saved best model checkpoint (val_F1={val_f1:.4f})\n")
 
     # Final test evaluation on best checkpoint
     print("\n" + "="*55)
-    print("📊 Test Set Evaluation (best checkpoint):")
+    print("[RESULT] Test Set Evaluation (best checkpoint):")
     print("="*55)
     # Reload best
     from transformers import AutoModelForSequenceClassification as AMC
     best_model = AMC.from_pretrained(output_dir, num_labels=NUM_LABELS).to(device)
     _, preds, labels = evaluate(best_model, test_loader, device)
     print(classification_report(labels, preds, target_names=TACTIC_LABELS, zero_division=0))
-    print(f"\n✅ Training complete. Best val macro-F1: {best_val_f1:.4f}")
+    print(f"\n[COMPLETE] Training complete. Best val macro-F1: {best_val_f1:.4f}")
     print(f"   Model saved to: {output_dir}")
     print(f"\nTo use real model in API:")
     print(f"  Set MODEL_PATH={output_dir}")

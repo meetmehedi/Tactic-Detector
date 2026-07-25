@@ -63,7 +63,7 @@ def fetch_mentalmanip() -> list[dict]:
     try:
         ds = load_dataset("audreyeleven/MentalManip", split="train", trust_remote_code=True)
     except Exception as e:
-        print(f"  ⚠ Could not load MentalManip: {e}")
+        print(f"  [WARNING] Could not load MentalManip: {e}")
         return []
 
     records = []
@@ -85,7 +85,7 @@ def fetch_mentalmanip() -> list[dict]:
             "tactics": tactics,
             "source": "mentalmanip",
         })
-    print(f"  ✓ {len(records)} examples")
+    print(f"  [OK] {len(records)} examples")
     return records
 
 
@@ -109,7 +109,7 @@ def fetch_manipulative_language() -> list[dict]:
     try:
         ds = load_dataset("pauladroghoff/manipulative-language-detection", split="train", trust_remote_code=True)
     except Exception as e:
-        print(f"  ⚠ Could not load: {e}")
+        print(f"  [WARNING] Could not load: {e}")
         return []
 
     records = []
@@ -127,7 +127,7 @@ def fetch_manipulative_language() -> list[dict]:
             "tactics": tactics,
             "source": "manipulative_language",
         })
-    print(f"  ✓ {len(records)} examples")
+    print(f"  [OK] {len(records)} examples")
     return records
 
 
@@ -149,7 +149,7 @@ def fetch_phishing() -> list[dict]:
     try:
         ds = load_dataset("ealvaradob/phishing-dataset", "emails", split="train", trust_remote_code=True)
     except Exception as e:
-        print(f"  ⚠ Could not load phishing/emails: {e}")
+        print(f"  [WARNING] Could not load phishing/emails: {e}")
         ds = None
 
     records = []
@@ -174,7 +174,7 @@ def fetch_phishing() -> list[dict]:
                 "tactics": tactics,
                 "source": "phishing_email",
             })
-        print(f"  ✓ {len(records)} phishing email examples")
+        print(f"  [OK] {len(records)} phishing email examples")
 
     # Also load SMS if available
     try:
@@ -198,9 +198,9 @@ def fetch_phishing() -> list[dict]:
                 "source": "phishing_sms",
             })
         records.extend(sms_records)
-        print(f"  ✓ {len(sms_records)} phishing SMS examples")
+        print(f"  [OK] {len(sms_records)} phishing SMS examples")
     except Exception as e:
-        print(f"  ⚠ Could not load phishing/sms: {e}")
+        print(f"  [WARNING] Could not load phishing/sms: {e}")
 
     return records
 
@@ -221,7 +221,7 @@ def fetch_social_engineering_convo() -> list[dict]:
     try:
         ds = load_dataset("Ngadou/social-engineering-convo", split="train", trust_remote_code=True)
     except Exception as e:
-        print(f"  ⚠ Could not load: {e}")
+        print(f"  [WARNING] Could not load: {e}")
         return []
 
     records = []
@@ -239,7 +239,7 @@ def fetch_social_engineering_convo() -> list[dict]:
             "tactics": tactics,
             "source": "social_engineering_convo",
         })
-    print(f"  ✓ {len(records)} examples")
+    print(f"  [OK] {len(records)} examples")
     return records
 
 
@@ -253,7 +253,7 @@ def fetch_sms_spam() -> list[dict]:
         try:
             ds = load_dataset("ucirvine/sms_spam", split="train", trust_remote_code=True)
         except Exception as e:
-            print(f"  ⚠ Could not load SMS spam: {e}")
+            print(f"  [WARNING] Could not load SMS spam: {e}")
             return []
 
     records = []
@@ -276,7 +276,7 @@ def fetch_sms_spam() -> list[dict]:
             "tactics": tactics,
             "source": "sms_spam",
         })
-    print(f"  ✓ {len(records)} examples")
+    print(f"  [OK] {len(records)} examples")
     return records
 
 
@@ -287,7 +287,7 @@ def fetch_daily_dialog(max_turns: int = 3000) -> list[dict]:
     try:
         ds = load_dataset("daily_dialog", split="train", trust_remote_code=True)
     except Exception as e:
-        print(f"  ⚠ Could not load DailyDialog: {e}")
+        print(f"  [WARNING] Could not load DailyDialog: {e}")
         return []
 
     records = []
@@ -309,7 +309,7 @@ def fetch_daily_dialog(max_turns: int = 3000) -> list[dict]:
         conv_id += 1
         if len(records) >= max_turns:
             break
-    print(f"  ✓ {len(records)} benign turns")
+    print(f"  [OK] {len(records)} benign turns")
     return records
 
 
@@ -339,10 +339,10 @@ def fetch_persuasion_for_good() -> list[dict]:
         from convokit import Corpus, download
         corpus = Corpus(filename=download("persuasionforgood-corpus"))
     except ImportError:
-        print("  ⚠ convokit not installed. Run: pip install convokit")
+        print("  [WARNING] convokit not installed. Run: pip install convokit")
         return []
     except Exception as e:
-        print(f"  ⚠ Could not load Persuasion for Good: {e}")
+        print(f"  [WARNING] Could not load Persuasion for Good: {e}")
         return []
 
     records = []
@@ -368,7 +368,7 @@ def fetch_persuasion_for_good() -> list[dict]:
                 "tactics": tactics,
                 "source": "persuasion_for_good",
             })
-    print(f"  ✓ {len(records)} turns from {corpus.num_conversations} conversations")
+    print(f"  [OK] {len(records)} turns from {corpus.num_conversations} conversations")
     return records
 
 
@@ -407,7 +407,7 @@ def main():
     source_counts = Counter(r["source"] for r in all_records)
 
     print(f"\n{'='*50}")
-    print(f"✅ Total records: {len(all_records):,}")
+    print(f"[INFO] Total records: {len(all_records):,}")
     print(f"\nPer tactic:")
     for t, c in sorted(tactic_counts.items(), key=lambda x: -x[1]):
         print(f"  {t:<14} {c:>6,}")

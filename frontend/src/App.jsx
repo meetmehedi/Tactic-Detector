@@ -102,9 +102,13 @@ export default function App() {
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
               background: 'var(--accent)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', fontSize: 14,
+              alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
-            }}>🛡️</div>
+            }}>
+              <svg style={{ width: 16, height: 16, stroke: '#fff' }} viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
             <span style={{ fontWeight: 900, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--text-1)' }}>
               Tactic<span style={{ color: 'var(--accent)', fontWeight: 600 }}>Detector</span>
             </span>
@@ -168,11 +172,16 @@ export default function App() {
               onClick={toggleTheme}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               style={{
-                padding: '6px 10px', borderRadius: 100, fontSize: 14, cursor: 'pointer',
+                padding: '6px 10px', borderRadius: 100, fontSize: 13, cursor: 'pointer',
                 background: 'var(--surface-2)', border: '1px solid var(--border)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-1)',
               }}
             >
-              {theme === 'dark' ? '🌙' : '☀️'}
+              {theme === 'dark' ? (
+                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              ) : (
+                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              )}
             </button>
           </div>
         </div>
@@ -205,7 +214,7 @@ export default function App() {
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                       }}
                     >
-                      {meta.icon} {meta.label}
+                      <span style={{ fontSize: 10, fontFamily: 'var(--mono)', fontWeight: 700 }}>[{meta.code}]</span> {meta.label}
                     </span>
                   );
                 })}
@@ -222,7 +231,10 @@ export default function App() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
                 fontSize: 13,
               }}>
-                <span>⚠️ {error}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg style={{ width: 15, height: 15 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>{error}</span>
+                </div>
                 <button onClick={() => setError('')} style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontSize: 16 }}>✕</button>
               </div>
             )}
@@ -259,7 +271,10 @@ export default function App() {
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}
               >
-                ✏️ New Analysis
+                <svg style={{ width: 14, height: 14 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                New Analysis
               </button>
             </div>
 
@@ -269,7 +284,7 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)' }}>
-                    💬 Turn-by-Turn Analysis ({result.turns.length} turns)
+                    Turn-by-Turn Analysis ({result.turns.length} turns)
                   </span>
                   <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>
                     {result.flagged_turn_ids?.length || 0} Flagged

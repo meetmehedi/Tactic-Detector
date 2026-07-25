@@ -5,44 +5,44 @@ const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 export const TACTIC_META = {
   urgency: {
     label: 'Urgency',
+    code: 'URG',
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.15)',
-    icon: '⏰',
     desc: 'Artificial time pressure or deadline to force immediate action',
   },
   authority: {
     label: 'Authority',
+    code: 'AUT',
     color: '#3b82f6',
     bg: 'rgba(59,130,246,0.15)',
-    icon: '🎖️',
     desc: 'Impersonates trusted officials, banks, or law enforcement',
   },
   isolation: {
     label: 'Isolation',
+    code: 'ISO',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.15)',
-    icon: '🔒',
     desc: 'Discourages victim from consulting friends, family, or experts',
   },
   reciprocity: {
     label: 'Reciprocity',
+    code: 'REC',
     color: '#10b981',
     bg: 'rgba(16,185,129,0.15)',
-    icon: '🤝',
     desc: 'Leverages past favors or emotional obligations to extract compliance',
   },
   emotional: {
     label: 'Emotional',
+    code: 'EMO',
     color: '#ef4444',
     bg: 'rgba(239,68,68,0.15)',
-    icon: '💔',
     desc: 'Exploits fear, panic, romance, guilt, or sympathy',
   },
   benign: {
     label: 'Benign',
+    code: 'BEN',
     color: '#6b7280',
     bg: 'rgba(75,85,99,0.15)',
-    icon: '✅',
     desc: 'Standard non-manipulative conversation',
   },
 };
@@ -50,7 +50,7 @@ export const TACTIC_META = {
 export const PRESET_SCENARIOS = [
   {
     id: 'romance',
-    title: '💔 Romance Scam',
+    title: 'Romance Scam',
     desc: 'Offshore emergency & secret money transfer',
     text: `Scammer: Hey beautiful, I've been thinking about you all day. You're the only one who truly understands me.
 Victim: Aw, that's sweet. I've been thinking about you too.
@@ -63,7 +63,7 @@ Scammer: After everything we shared, act now please. The deadline is tonight. I 
   },
   {
     id: 'tech_support',
-    title: '💻 Tech Support Scam',
+    title: 'Tech Support Scam',
     desc: 'Microsoft security alert & virus removal threat',
     text: `Scammer: Hello, this is Microsoft Security Division. We detected a critical virus on your computer.
 Victim: Oh really? I didn't notice anything wrong.
@@ -75,7 +75,7 @@ Scammer: Ma'am, I am an authorized federal officer. Act now or face legal conseq
   },
   {
     id: 'bank_phishing',
-    title: '🏦 Bank Account Freeze',
+    title: 'Bank Account Freeze',
     desc: 'Impersonating fraud protection department',
     text: `Scammer: Urgent Security Alert: Your Chase Bank card was used for a $1,450 transaction in Texas.
 Victim: Wait, I didn't make that purchase!
@@ -85,7 +85,7 @@ Scammer: Do not hang up or call anyone else! The fraud transfer will settle in 9
   },
   {
     id: 'job_offer',
-    title: '💼 Fake Remote Job',
+    title: 'Fake Remote Job',
     desc: 'Check deposit & equipment fee extraction',
     text: `Recruiter: Congratulations! You have been selected for our Remote Executive Assistant role at $45/hr.
 Candidate: Thank you! When do I start?

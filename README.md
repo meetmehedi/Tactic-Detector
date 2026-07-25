@@ -1,37 +1,37 @@
-# 🛡️ Social Engineering Tactic Detector
+# Social Engineering Tactic Detector
 
 > **AI-Powered Multi-Turn Conversation Analyzer & SHAP Explainability Engine**  
 > *Detects psychological manipulation tactics in chat transcripts turn-by-turn with token-level risk heatmaps.*
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-6366f1?style=for-the-badge&logo=github)](https://meetmehedi.github.io/Tactic-Detector/)
-[![Project Documentation](https://img.shields.io/badge/📄_Full_Documentation-PROJECT__DOCUMENTATION.md-009688?style=for-the-badge)](PROJECT_DOCUMENTATION.md)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-6366f1?style=for-the-badge&logo=github)](https://meetmehedi.github.io/Tactic-Detector/)
+[![Project Documentation](https://img.shields.io/badge/Full_Documentation-PROJECT__DOCUMENTATION.md-009688?style=for-the-badge)](PROJECT_DOCUMENTATION.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg?style=for-the-badge)](LICENSE)
 
 ---
 
-## 🌐 Live Web Application
+## Live Web Application
 
 The application is deployed and hosted on **GitHub Pages** with an offline client-side inference fallback:
 
-### 👉 **[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
+### **[https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)**
 
 *(No installation or server setup required — interactive demo runs directly in any web browser!)*
 
 ---
 
-## ✨ Features
+## Features
 
-- 💬 **Multi-Turn Conversation Parsing**: Analyzes full dialogue transcripts turn-by-turn.
-- 🎯 **Tactic Taxonomy Classification**: Identifies 5 core manipulation tactics (**Urgency**, **Authority**, **Isolation**, **Reciprocity**, **Emotional**) + **Benign** control.
-- 🔥 **SHAP Token Attribution Heatmaps**: Highlights exact manipulative trigger phrases (High, Medium, Low risk).
-- 📊 **Overall Risk Index Gauge**: Calculates holistic transcript threat scores ($0\% \text{ to } 100\%$).
-- 🗺️ **Interactive Turn Map**: Quick-jump navigation grid for reviewing flagged scam turns.
-- 🎨 **Minimalist Futuristic UI**: Steve Jobs × AI Researcher aesthetic inspired by `mdmehedihasan.us` with Dark/Light theme support.
-- 🚀 **Zero-Downtime Deployment**: Hybrid API execution (FastAPI backend + browser client-side fallback).
+- **Multi-Turn Conversation Parsing**: Analyzes full dialogue transcripts turn-by-turn.
+- **Tactic Taxonomy Classification**: Identifies 5 core manipulation tactics (**Urgency**, **Authority**, **Isolation**, **Reciprocity**, **Emotional**) + **Benign** control.
+- **SHAP Token Attribution Heatmaps**: Highlights exact manipulative trigger phrases (High, Medium, Low risk).
+- **Overall Risk Index Gauge**: Calculates holistic transcript threat scores ($0\% \text{ to } 100\%$).
+- **Interactive Turn Map**: Quick-jump navigation grid for reviewing flagged scam turns.
+- **Minimalist Futuristic UI**: Steve Jobs × AI Researcher aesthetic inspired by `mdmehedihasan.us` with Dark/Light theme support.
+- **Zero-Downtime Deployment**: Hybrid API execution (FastAPI backend + browser client-side fallback).
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -59,28 +59,28 @@ The application is deployed and hosted on **GitHub Pages** with an offline clien
 
 ---
 
-## 🔬 Tactic Taxonomy
+## Tactic Taxonomy
 
-| Tactic | Icon | Description | Key Triggers |
+| Tactic | Code | Description | Key Triggers |
 |---|---|---|---|
-| **Urgency** | ⏰ | Artificial time pressure & deadlines | *"immediately"*, *"24 hours"*, *"urgent"*, *"today"* |
-| **Authority** | 🎖️ | Impersonating banks, police, or officials | *"officer"*, *"security division"*, *"federal"*, *"court"* |
-| **Isolation** | 🔒 | Demanding secrecy & no external advice | *"don't tell anyone"*, *"keep it private"*, *"do not hang up"* |
-| **Reciprocity** | 🤝 | Exploiting past favors or small gifts | *"wire fee"*, *"gift card"*, *"send code"*, *"deposit check"* |
-| **Emotional** | 💔 | Exploiting fear, panic, guilt, or romance | *"stranded"*, *"scared"*, *"consequences"*, *"love you"* |
-| **Benign** | ✅ | Standard everyday dialogue | *"hello"*, *"where are you?"*, *"thanks"* |
+| **Urgency** | URG | Artificial time pressure & deadlines | *"immediately"*, *"24 hours"*, *"urgent"*, *"today"* |
+| **Authority** | AUT | Impersonating banks, police, or officials | *"officer"*, *"security division"*, *"federal"*, *"court"* |
+| **Isolation** | ISO | Demanding secrecy & no external advice | *"don't tell anyone"*, *"keep it private"*, *"do not hang up"* |
+| **Reciprocity** | REC | Exploiting past favors or small gifts | *"wire fee"*, *"gift card"*, *"send code"*, *"deposit check"* |
+| **Emotional** | EMO | Exploiting fear, panic, guilt, or romance | *"stranded"*, *"scared"*, *"consequences"*, *"love you"* |
+| **Benign** | BEN | Standard everyday dialogue | *"hello"*, *"where are you?"*, *"thanks"* |
 
 ---
 
-## 📄 Documentation & Academic Submission
+## Documentation & Academic Submission
 
 For complete project documentation including dataset generation, model fine-tuning loss functions, evaluation metrics, and validation reports, read:
 
-👉 **[`PROJECT_DOCUMENTATION.md`](PROJECT_DOCUMENTATION.md)**
+**[`PROJECT_DOCUMENTATION.md`](PROJECT_DOCUMENTATION.md)**
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Machine Learning**: PyTorch, HuggingFace Transformers (`distilbert-base-uncased`), SHAP, Scikit-learn
 - **Backend API**: Python 3.11, FastAPI, Uvicorn, Pydantic
@@ -89,7 +89,7 @@ For complete project documentation including dataset generation, model fine-tuni
 
 ---
 
-## 🌐 Deployment & Live Access
+## Deployment & Live Access
 
 The web application is deployed on **GitHub Pages**:
 
@@ -99,6 +99,7 @@ The web application is deployed on **GitHub Pages**:
 
 ---
 
-## 📜 License
+## License
 
 Distributed under the **MIT License**. Created by **Md. Mehedi Hasan** for AI Safety & NLP Security Research.
+

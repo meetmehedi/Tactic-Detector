@@ -1,4 +1,4 @@
-# 🛡️ Tactic Detector: AI-Powered Social Engineering Manipulation Analyzer
+# Tactic Detector: AI-Powered Social Engineering Manipulation Analyzer
 > **Comprehensive System Documentation & Technical Report**  
 > **Author**: Md. Mehedi Hasan  
 > **Live Web Application**: [https://meetmehedi.github.io/Tactic-Detector/](https://meetmehedi.github.io/Tactic-Detector/)  
@@ -6,7 +6,7 @@
 
 ---
 
-## 📌 Executive Summary
+## Executive Summary
 
 **Tactic Detector** is an end-to-end Machine Learning system designed to detect, classify, and visually explain psychological manipulation tactics used in multi-turn social engineering conversations (e.g., romance scams, tech support fraud, bank phishing, and fake job offers).
 
@@ -16,7 +16,7 @@ The solution features a high-performance **FastAPI backend**, a sleek **React + 
 
 ---
 
-## 🏗️ 1. System Architecture
+## 1. System Architecture
 
 The project consists of three core layers:
 
@@ -46,7 +46,7 @@ The project consists of three core layers:
 
 ---
 
-## 🧠 2. Machine Learning Pipeline & Model Architecture
+## 2. Machine Learning Pipeline & Model Architecture
 
 ### 2.1 Model Specification
 - **Base Architecture**: `distilbert-base-uncased` (66 Million Parameters)
@@ -59,12 +59,12 @@ The model classifies input text into six non-mutually exclusive categories:
 
 | Tactic Label | Symbol | Description | Psychological Mechanism |
 |---|---|---|---|
-| **Urgency** | ⏰ | Artificial time pressure or deadlines | Forces hasty compliance by bypassing analytical thinking |
-| **Authority** | 🎖️ | Impersonation of officials, banks, or law | Exploits ingrained obedience to established authority figures |
-| **Isolation** | 🔒 | Secrecy demands and discouraging external help | Prevents victims from seeking second opinions or sanity checks |
-| **Reciprocity** | 🤝 | Leveraging past favors or small gifts | Triggers social obligations to return favors or make payments |
-| **Emotional** | 💔 | Exploiting fear, panic, romance, or guilt | Clouding judgment through heightened emotional state |
-| **Benign** | ✅ | Normal non-manipulative conversation | Control class for standard everyday dialogue |
+| **Urgency** | URG | Artificial time pressure or deadlines | Forces hasty compliance by bypassing analytical thinking |
+| **Authority** | AUT | Impersonation of officials, banks, or law | Exploits ingrained obedience to established authority figures |
+| **Isolation** | ISO | Secrecy demands and discouraging external help | Prevents victims from seeking second opinions or sanity checks |
+| **Reciprocity** | REC | Leveraging past favors or small gifts | Triggers social obligations to return favors or make payments |
+| **Emotional** | EMO | Exploiting fear, panic, romance, or guilt | Clouding judgment through heightened emotional state |
+| **Benign** | BEN | Normal non-manipulative conversation | Control class for standard everyday dialogue |
 
 ### 2.3 Sliding-Window Context Concatenation
 Single turns in a conversation often lack sufficient context (e.g., *"Why do I need to do that?"*). To resolve ambiguity:
@@ -74,7 +74,7 @@ This allows the model to process contextual state changes across turns.
 
 ---
 
-## 📊 3. Dataset & Training Methodology
+## 3. Dataset & Training Methodology
 
 ### 3.1 Dataset Preparation
 The dataset consists of multi-turn conversational transcripts collected from real scam logs, public phishing benchmarks, and domain-specific synthetic scenario generation.
@@ -101,7 +101,7 @@ Social engineering tactics occur in varying frequencies. To address class imbala
 
 ---
 
-## 🔍 4. Explainable AI (SHAP Token Attribution)
+## 4. Explainable AI (SHAP Token Attribution)
 
 To eliminate "black-box" model outputs, Tactic Detector uses **SHAP (SHapley Additive exPlanations)** based on game theory:
 
@@ -109,13 +109,13 @@ $$\phi_i(v) = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!(|N| - |S| - 1)!}{|
 
 ### Token Attribution Highlighting Rules
 Each word $w$ is scored based on its marginal contribution to the predicted tactic logits:
-- 🔴 **High Risk (>65%)**: Critical scam trigger words (e.g., *"wire"*, *"passcode"*, *"suspended"*, *"police"*)
-- 🟡 **Medium Risk (40–65%)**: Contextual pressure words (e.g., *"urgent"*, *"today"*, *"immediately"*)
-- 🟣 **Low Risk (20–40%)**: Supporting narrative words
+- **High Risk (>65%)**: Critical scam trigger words (e.g., *"wire"*, *"passcode"*, *"suspended"*, *"police"*)
+- **Medium Risk (40–65%)**: Contextual pressure words (e.g., *"urgent"*, *"today"*, *"immediately"*)
+- **Low Risk (20–40%)**: Supporting narrative words
 
 ---
 
-## 💻 5. Frontend UI & Design System
+## 5. Frontend UI & Design System
 
 The frontend was built with **React 18** and **Vite** adhering to modern aesthetic principles inspired by `mdmehedihasan.us`:
 
@@ -127,7 +127,7 @@ The frontend was built with **React 18** and **Vite** adhering to modern aesthet
 
 ---
 
-## 🚀 6. Deployment & GitHub Pages Static Hosting
+## 6. Deployment & GitHub Pages Static Hosting
 
 To ensure the web application is instantly accessible on **GitHub Pages** without requiring a live Python server:
 
@@ -137,7 +137,7 @@ To ensure the web application is instantly accessible on **GitHub Pages** withou
 
 ---
 
-## 🛠️ 7. Project Structure
+## 7. Project Structure
 
 ```
 Tactic-Detector/
@@ -168,7 +168,7 @@ Tactic-Detector/
 
 ---
 
-## 🌐 8. Deployment & Live Application Access
+## 8. Deployment & Live Application Access
 
 The project is fully built, packaged, and deployed on **GitHub Pages**:
 
@@ -178,7 +178,7 @@ The project is fully built, packaged, and deployed on **GitHub Pages**:
 
 ---
 
-## 🎓 9. Conclusion & Future Work
+## 9. Conclusion & Future Work
 
 Tactic Detector demonstrates how transformer-based multi-label NLP classification paired with XAI token attribution can effectively identify social engineering threats in multi-turn dialogue.
 
@@ -186,3 +186,4 @@ Tactic Detector demonstrates how transformer-based multi-label NLP classificatio
 - **Audio Transcript Processing**: Integration with Whisper API for real-time phone call fraud detection.
 - **Multilingual Support**: Extending classification to multilingual social engineering scenarios (e.g., Bengali, Spanish).
 - **Real-Time Extension**: Packaging into a Chrome Extension for live webmail & chat monitoring.
+
