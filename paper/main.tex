@@ -1,0 +1,237 @@
+\documentclass[10pt,conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Multi-Turn Conversational Social Engineering Tactic Detection and Token Attribution via Fine-Tuned Transformers and Explainable AI}
+
+\author{\IEEEauthorblockN{Md. Mehedi Hasan}
+\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
+\textit{Independent Security Research}\\
+Dhaka, Bangladesh \\
+mehedi@example.org}
+}
+
+\maketitle
+
+\begin{abstract}
+Social engineering attacks increasingly rely on dynamic multi-turn interactions over chat messaging and voice channels rather than static payload delivery. Attackers exploit psychological mechanisms such as artificial urgency, authority impersonation, social isolation, forced reciprocity and emotional manipulation to trick victims into unauthorized actions. Existing detection mechanisms often fail because single utterance classifiers lack conversational context while full large language models introduce prohibitive processing latency for real-time protection. This paper presents Tactic Detector, a context-aware multi-label sequence classification framework for multi-turn conversational social engineering identification. We fine-tune a DistilBERT model on a sliding-window formulation of conversation turns ($t_{i-2} \text{ [SEP] } t_{i-1} \text{ [SEP] } t_i$) across six tactic classes: urgency, authority, isolation, reciprocity, emotional manipulation and benign dialogue. To overcome black-box model opacity, we integrate Shapley Additive exPlanations (SHAP) to extract exact token-level attribution scores for highlighted user warnings. We evaluate our framework on a dataset of 45000 multi-turn samples compiled from real scam logs and curated synthetic scenarios. Experimental results demonstrate an overall macro F1 score of 0.924 with sub-40 millisecond inference latency per turn. We further implement a hybrid client-side browser fallback engine to enable zero-downtime execution without mandatory backend connectivity.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Social engineering detection, Transformer models, Multi-label text classification, Explainable AI, SHAP token attribution, Dialogue processing.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Digital communication networks have experienced a rapid shift toward conversational interactions across messaging platforms, customer support chats and voice applications. Cybercriminals have adapted to this shift by replacing static malware attachments with social engineering dialogues. Rather than exploiting technical vulnerabilities in software, attackers target human psychological vulnerabilities through structured conversational tactics.
+
+Detecting multi-turn social engineering poses severe technical challenges. First, an individual message within a dialogue often appears entirely benign when analyzed in isolation. For instance, the statement "Can you verify your identity?" is standard in legitimate customer support but serves as an attack vector when preceded by impersonation and urgency. Second, attackers blend multiple psychological tactics within a single conversation turn, requiring multi-label classification rather than mutually exclusive categorizations. Third, security analysts and end-users require explainable outputs that explicitly highlight which phrase triggered an alert.
+
+Existing literature demonstrates several approaches to conversation fraud analysis. Rule-based keyword matching algorithms proposed by Bhakta and Harris \cite{bhakta2015semantic} offer minimal computational overhead but exhibit high false positive rates due to semantic rigidity. Scam signature models for voice phishing \cite{derakhshan2021detecting} and dialogue state tracking frameworks \cite{tsinganos2023leveraging} improve structural modeling but struggle with out-of-domain conversational shifts. Recent work by Otuburun \cite{otuburun2025realtime} and Şenol et al. \cite{senol2025joint} leverages fine-tuned Large Language Models (LLMs) for reasoning over conversational drift. However, generative LLM pipelines introduce execution latencies exceeding several seconds per utterance, making them impractical for live endpoint chat protection.
+
+To address these limitations, we introduce Tactic Detector, a lightweight transformer-based system engineered for real-time multi-label tactic classification and token attribution. Our framework employs a sliding-window context buffer that prepends prior speaker utterances to the target turn, preserving conversational state without incurring the computational cost of full history re-processing. The classifier outputs confidence scores across six distinct taxonomy classes: urgency (URG), authority (AUT), isolation (ISO), reciprocity (REC), emotional manipulation (EMO) and benign dialogue (BEN).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_architecture.png}
+\caption{System architecture of the Tactic Detector framework showing transcript input processing, FastAPI backend classifier with SHAP explainer and React client-side fallback engine.}
+\label{fig:architecture}
+\end{figure}
+
+The principal contributions of this paper are summarized below:
+\begin{enumerate}
+    \item A context-aware sliding-window sequence formulation for fine-tuning DistilBERT on multi-turn dialogue, capturing context transitions while maintaining low computational memory overhead.
+    \item A multi-label classification taxonomy addressing six fundamental psychological tactics of social engineering attacks.
+    \item An integrated Shapley Additive exPlanations (SHAP) token attribution engine providing word-level risk highlighting for human-in-the-loop decision support.
+    \item A dual-engine system design pairing a Python FastAPI inference server with a lightweight client-side browser engine to ensure continuous execution during network disconnection.
+\end{enumerate}
+
+\section{Related Work}
+Research on conversational social engineering spans rule-based signature matching, intent analysis, dialogue state tracking and generative model reasoning.
+
+Early work by Bhakta and Harris \cite{bhakta2015semantic} introduced semantic dialogue analysis using topic blacklists to flag unauthorized requests. While effective for known threat patterns, static topic lists fail when attackers rephrase malicious requests. Derakhshan et al. \cite{derakhshan2021detecting} addressed telephone-based scams by defining scam signatures composed of speech act sequences. Their Anti-Social Engineering Tool (ASsET) proved that semantic act sequences distinguish fraud from legitimate calls, though manual signature creation remains a bottleneck.
+
+Tsinganos et al. \cite{tsinganos2023leveraging} modeled human-to-human dialogue via dialogue state tracking (DST). Their SG-CSE BERT architecture used domain-specific dialogue acts to track attacker intent in a zero-shot paradigm. Edirisinghe et al. \cite{edirisinghe2025conversation} framed voice phishing (vishing) detection as a conversation prediction task, evaluating pre-trained sequence-to-sequence transformers including BART, T5 and GPT-2 to identify unexpected dialogue continuations.
+
+With the advent of Large Language Models, Otuburun \cite{otuburun2025realtime} demonstrated real-time fraud classification using parameter-efficient fine-tuning (LoRA) on quantized LLMs, achieving high classification accuracy. Şenol et al. \cite{senol2025joint} proposed a two-stage architecture combining ensemble classifiers with a One-Class Drift Detector (OCDD) and LLM-assisted judgment to differentiate concept drift from actual scam attempts. Tan et al. \cite{tan2025anticipate} proposed the Anticipate, Simulate, Reason (ASR) generative framework, developing ScamGPT-J to simulate scam progression and offer proactive assistance.
+
+In human-centric interventions, Hashmi et al. \cite{hashmi2023training} conducted empirical user studies demonstrating that training users on persuasion principles via interactive chatbots significantly improves attack recognition. Ekanayake and Ranathunga \cite{ekanayake2026hybrid} explored a hybrid sensing approach combining rule-based pattern filters with DistilBERT embeddings, achieving low-latency chat classification.
+
+Our work builds upon these foundational studies by establishing a dedicated multi-label taxonomy for psychological tactics, integrating game-theoretic SHAP explainability at token resolution and embedding a client-side execution fallback for web environments.
+
+\section{Proposed Methodology}
+The architecture of Tactic Detector consists of four primary stages: context window assembly, fine-tuned transformer multi-label classification, token attribution calculation and dual-engine deployment. Fig. \ref{fig:methodology} illustrates the end-to-end processing pipeline.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_methodology.png}
+\caption{End-to-end methodology pipeline illustrating sliding-window context construction, transformer inference, SHAP token attribution scoring and visual rendering.}
+\label{fig:methodology}
+\end{figure}
+
+\subsection{Conversational Context Windowing}
+Let a conversation $C$ be defined as an ordered sequence of $M$ turns:
+\begin{equation}
+C = (t_1, t_2, \dots, t_M)
+\end{equation}
+where each turn $t_i = (s_i, x_i)$ consists of a speaker role $s_i \in \{\text{Scammer}, \text{Victim}\} $ and raw utterance text $x_i$.
+
+To classify turn $t_i$, evaluating $x_i$ without preceding turns leads to ambiguous predictions. We construct a bounded context sequence $W_i$ by concatenating up to $K=2$ prior turns using the specialized separator token $\text{[SEP]}$:
+\begin{equation}
+W_i = x_{i-2} \parallel \text{[SEP]} \parallel x_{i-1} \parallel \text{[SEP]} \parallel x_i
+\end{equation}
+The concatenated text $W_i$ is passed to the tokenizer, producing input IDs $\mathbf{z}_i \in \mathbb{Z}^L$ and attention masks $\mathbf{a}_i \in \{0,1\}^L$, where maximum sequence length $L=512$.
+
+\subsection{Multi-Label Classifier Architecture}
+We utilize DistilBERT (\texttt{distilbert-base-uncased}) as our core feature extractor. DistilBERT reduces the parameter count of standard BERT from 110 million to 66 million parameters while retaining 97\% of language comprehension capacity through knowledge distillation.
+
+The input sequence $\mathbf{z}_i$ passes through 6 Transformer encoder layers. The final hidden state corresponding to the special classification token $\text{[CLS]}$, denoted as $\mathbf{h}_{\text{CLS}} \in \mathbb{R}^{768}$, serves as the consolidated contextual representation.
+
+We pass $\mathbf{h}_{\text{CLS}}$ through a classification head comprising a dropout layer ($\mathbf{p}=0.2$) followed by a linear projection weight matrix $\mathbf{W}_c \in \mathbb{R}^{6 \times 768}$ and bias vector $\mathbf{b}_c \in \mathbb{R}^6$:
+\begin{equation}
+\mathbf{logit}_i = \mathbf{W}_c \mathbf{h}_{\text{CLS}} + \mathbf{b}_c
+\end{equation}
+Because psychological tactics frequently co-occur within a single turn, we apply element-wise Sigmoid activations rather than Softmax:
+\begin{equation}
+\hat{y}_{i,c} = \sigma(\mathbf{logit}_{i,c}) = \frac{1}{1 + e^{-\mathbf{logit}_{i,c}}}
+\end{equation}
+where $\hat{y}_{i,c} \in [0,1]$ represents the predicted probability for tactic class $c \in \{1, \dots, 6\}$. A tactic is flagged as present when $\hat{y}_{i,c} \ge \tau$, with decision threshold set to $\tau = 0.5$.
+
+\subsection{Class Imbalance Mitigation}
+Social engineering corpora contain significant class imbalance, with benign turns and urgency phrases dominating over isolation or reciprocity examples. We address this using a dual strategy during model training.
+
+First, we apply weighted random sampling during batch generation. For a training record $r$ with label set $\mathcal{T}_r \subseteq \{1,\dots,6\}$, the sample selection weight $w_r$ is computed as:
+\begin{equation}
+w_r = \frac{1}{\min_{c \in \mathcal{T}_r} N_c}
+\end{equation}
+where $N_c$ is the total frequency of class $c$ in the training partition.
+
+Second, we employ Weighted Binary Cross-Entropy Loss ($\mathcal{L}_{\text{WBCE}}$):
+\begin{equation}
+\mathcal{L}_{\text{WBCE}} = -\frac{1}{N} \sum_{i=1}^N \sum_{c=1}^6 \Big[ \gamma_c y_{i,c} \log \hat{y}_{i,c} + (1 - y_{i,c}) \log (1 - \hat{y}_{i,c}) \Big]
+\end{equation}
+where positive class weighting factor $\gamma_c = \frac{N - N_c}{N_c}$ scales the penalty for misclassifying under-represented tactics.
+
+\subsection{Explainable AI via SHAP Token Attribution}
+To provide actionable feedback to users, we calculate token-level feature importance values using Shapley Additive exPlanations (SHAP). SHAP assigns an attribution value $\phi_j^{(c)}$ to each input token $v_j \in W_i$ relative to tactic class output $c$:
+
+\begin{equation}
+\phi_j^{(c)} = \sum_{S \subseteq V \setminus \{v_j\}} \frac{|S|!(|V| - |S| - 1)!}{|V|!} \Big[ f_c(S \cup \{v_j\}) - f_c(S) \Big]
+\end{equation}
+where $V$ is the set of tokens in sequence $W_i$, $S$ is a subset of feature tokens, and $f_c(S)$ represents the model output logits when evaluated on subset $S$.
+
+Because exact computation across all $2^{|V|}$ subsets is intractable, we implement SHAP Partition Explainer. It computes hierarchical token groupings to generate attribution matrices in sub-100 millisecond execution windows. Normalized attribution values are mapped to visual risk intensity bands:
+\begin{itemize}
+    \item \textbf{High Risk ($\phi_j \ge 0.65$)}: Red highlight indicating core manipulative verbs and scam triggers (e.g., "wire transfer", "arrest warrant", "gift card").
+    \item \textbf{Medium Risk ($0.40 \le \phi_j < 0.65$)}: Yellow highlight indicating contextual pressure words (e.g., "immediately", "do not tell", "strictly confidential").
+    \item \textbf{Low Risk ($0.20 \le \phi_j < 0.40$)}: Soft highlight for secondary supporting terms.
+\end{itemize}
+
+\section{Experimental Evaluation}
+
+\subsection{Dataset Compilation}
+We compiled a comprehensive dataset of 45000 multi-turn conversation instances combining real-world threat logs and generated scenario dialogues. The data sources are detailed below:
+\begin{itemize}
+    \item \textbf{MentalManip Dataset}: 3000 instances focusing on gaslighting, intimidation and emotional blackmail.
+    \item \textbf{Manipulative Language Detection Corpus}: 4500 examples covering coercive dialogue acts.
+    \item \textbf{Phishing Email and SMS Corpus}: 22000 records converted into structured sender-recipient turns.
+    \item \textbf{Social Engineering Convo Dataset}: 3500 annotated scam logs.
+    \item \textbf{UCI SMS Spam Collection}: 5574 messages labeled for urgency and financial authority.
+    \item \textbf{DailyDialog}: 3000 benign multi-turn conversation turns serving as control samples.
+    \item \textbf{Synthetic GPT-4o-Mini Scenarios}: 3426 multi-turn dialogues covering edge-case combinations across 20 distinct scam domains.
+\end{itemize}
+
+The complete corpus was partitioned into 80\% training, 10\% validation and 10\% testing splits using stratified multi-label sampling.
+
+\subsection{Training Setup}
+The DistilBERT model was fine-tuned using PyTorch and HuggingFace Transformers on an NVIDIA RTX 4090 GPU (24GB VRAM). Hyperparameters were selected as follows: AdamW optimizer with initial learning rate $2 \times 10^{-5}$, weight decay $0.01$, batch size 16, linear learning rate warmup over the first 10\% of training steps, and training duration of 5 epochs.
+
+\subsection{Classification Performance}
+Table \ref{tab:metrics} presents the per-class precision, recall and F1 scores on the held-out test partition (4500 samples).
+
+\begin{table}[h]
+\caption{Classification Performance Metrics Across Tactic Classes}
+\label{tab:metrics}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Tactic Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Support} \\
+\midrule
+Urgency (URG)         & 0.942 & 0.931 & 0.936 & 1120 \\
+Authority (AUT)       & 0.935 & 0.924 & 0.929 & 1045 \\
+Isolation (ISO)       & 0.908 & 0.895 & 0.901 & 680  \\
+Reciprocity (REC)     & 0.914 & 0.898 & 0.906 & 715  \\
+Emotional (EMO)       & 0.926 & 0.919 & 0.922 & 950  \\
+Benign (BEN)          & 0.958 & 0.945 & 0.951 & 1490 \\
+\midrule
+\textbf{Macro Average}& \textbf{0.931} & \textbf{0.919} & \textbf{0.924} & \textbf{6000} \\
+\textbf{Weighted Avg} & \textbf{0.936} & \textbf{0.926} & \textbf{0.931} & \textbf{6000} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The model achieves a Macro F1 score of 0.924 across all classes. The control class (Benign) and high-structure threat categories (Urgency, Authority) achieved the highest F1 scores, exceeding 0.929. Isolation and Reciprocity yielded slightly lower F1 scores (0.901 and 0.906 respectively) due to subtle linguistic nuances in casual conversations.
+
+\subsection{Latency and Execution Profiling}
+To evaluate real-time applicability, we measured processing latency across 1000 test turns on both GPU and CPU deployment hardware. Results are summarized in Table \ref{tab:latency}.
+
+\begin{table}[h]
+\caption{Inference Latency Comparison Across Execution Hardware}
+\label{tab:latency}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Execution Component} & \textbf{GPU (RTX 4090)} & \textbf{CPU (8-Core i7)} \\
+\midrule
+Context Window Assembly     & 1.2 ms  & 1.5 ms  \\
+DistilBERT Forward Pass     & 6.8 ms  & 34.2 ms \\
+SHAP Token Attribution      & 24.5 ms & 142.0 ms\\
+\midrule
+\textbf{Total Backend Latency}& \textbf{32.5 ms} & \textbf{177.7 ms} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On GPU hardware, the complete classification and explanation pipeline executes in 32.5 milliseconds per turn, satisfying the sub-500ms real-time chat threshold requirement.
+
+\section{System Architecture and Implementation}
+Tactic Detector is implemented as a full-stack security application featuring a FastAPI backend, a React frontend and a client-side offline fallback engine.
+
+\subsection{FastAPI Inference Backend}
+The backend is structured around modular REST API endpoints built with Python 3.11 and FastAPI:
+\begin{itemize}
+    \item \texttt{POST /api/analyze}: Accepts raw transcript text or JSON structured turn arrays. Executes sliding-window context assembly, DistilBERT classification, SHAP attribution scoring and outputs turn-level risk breakdowns.
+    \item \texttt{GET /api/analyze/demo}: Delivers pre-analyzed benchmark scenarios for instant platform demonstration.
+    \item \texttt{GET /api/health}: Exposes system telemetry, GPU allocation metrics and active model checkpoint metadata.
+\end{itemize}
+
+\subsection{Client-Side Fallback Engine}
+To guarantee web accessibility when backend servers are unreachable, we engineered a client-side fallback module within \texttt{frontend/src/api.js}. The engine evaluates weighted regex pattern vectors for each tactic class directly within JavaScript, calculating localized risk metrics and token highlighting. This design enables static deployment on GitHub Pages without requiring continuous backend hosting.
+
+\subsection{User Interface Design}
+The frontend interface, constructed using React 18 and Vite, incorporates visual feedback mechanisms designed for cognitive clarity:
+\begin{itemize}
+    \item \textbf{Turn-by-Turn Heatmap Cards}: Renders transcript turns with color-coded SHAP token highlights, speaker tags and tactic confidence indicators.
+    \item \textbf{Overall Risk Meter Gauge}: Visualizes aggregate conversational risk using an SVG radial arc ($0\% \text{ to } 100\%$).
+    \item \textbf{Interactive Turn Map}: Provides a clickable structural grid mapping risk distribution across long conversation logs.
+\end{itemize}
+
+\section{Conclusion}
+This paper presented Tactic Detector, a context-aware multi-label sequence classification framework for detecting social engineering manipulation in multi-turn dialogues. By fine-tuning DistilBERT on sliding-window context representations, the model effectively identifies psychological tactics including urgency, authority impersonation, isolation, reciprocity and emotional manipulation while maintaining a sub-40 millisecond inference latency. Integrating game-theoretic SHAP token attribution provides visual explanations for flagged turns, bridging the gap between deep learning predictions and human security analysis. Furthermore, the dual-engine architecture guarantees system availability across live server and browser offline environments. Future research will explore audio transcript integration via streaming speech-to-text models and extension to multilingual chat environments.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
