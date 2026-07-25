@@ -106,7 +106,7 @@ export default function App() {
               boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
             }}>
               <svg style={{ width: 16, height: 16, stroke: '#fff' }} viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </div>
             <span style={{ fontWeight: 900, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--text-1)' }}>
@@ -178,9 +178,9 @@ export default function App() {
               }}
             >
               {theme === 'dark' ? (
-                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" /></svg>
               ) : (
-                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg style={{ width: 14, height: 14, fill: 'none', stroke: 'currentColor' }} viewBox="0 0 24 24" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
               )}
             </button>
           </div>
@@ -197,7 +197,7 @@ export default function App() {
             <div className="hero-box">
               <h1 className="hero-title title-gradient">Social Engineering<br />Tactic Detector</h1>
               <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 20 }}>
-                Detect manipulation tactics in conversations using DistilBERT + SHAP attribution.
+                Detect manipulation tactics in conversations.
               </p>
               {/* Tactic pills */}
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
@@ -232,7 +232,7 @@ export default function App() {
                 fontSize: 13,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <svg style={{ width: 15, height: 15 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <svg style={{ width: 15, height: 15 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                   <span>{error}</span>
                 </div>
                 <button onClick={() => setError('')} style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontSize: 16 }}>✕</button>
@@ -243,7 +243,7 @@ export default function App() {
             <div className="input-widescreen">
               <TranscriptInput onAnalyze={handleAnalyze} onDemo={handleDemo} loading={loading} />
               <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)', marginTop: 24 }}>
-                Md. Mehedi Hasan · DistilBERT ML · SHAP Explainability Engine
+                Developed by Md. Mehedi Hasan
               </p>
             </div>
           </div>
